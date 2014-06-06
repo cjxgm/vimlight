@@ -9,9 +9,8 @@ dump = function(tbl, level)
 	s = s .. "{\n"
 
 	for k,v in pairs(tbl) do
-		local kname = tostring(k)
-		if type(k) ~= 'string' then kname = ("[%s]"):format(k) end
-		local prefix = ("%s%s%s = "):format(indent, indentation, kname)
+		if type(k) ~= 'string' then k = ("[%s]"):format(k) end
+		local prefix = ("%s%s%s = "):format(indent, indentation, k)
 		local t = type(v)
 		if t == "table" then
 			s = s .. ("%s%s,\n"):format(prefix, dump(v, level+1))
