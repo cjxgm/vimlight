@@ -24,19 +24,19 @@ local lexer = function(src)
 	local lex = function()
 		blanks()
 		while match_pos <= src_len do
-			if match("%a%w*") then		-- identifier
+			if match("[_%a][_%w]*") then	-- identifier
 				return 'id', matchs[1]
 			elseif match("/") then		-- regex
 				local regex = ""
 				while true do
 					if not match(".-/") then error("wrong regex") end
 					regex = regex .. matchs[1]
-					if matchs[1]:sub(-2, -2) ~= '\\' then
+					if matchs[1]:sub(-2, -2) ~= '\\' then	-- ignore escape [[\/]]
 						break
 					end
 				end
 				return 're', regex:sub(1, -2)
-			elseif match("[?*|&{}]") then	-- symbols
+			elseif match("[=?*+|&{}]") then	-- symbols
 				return 'sym', matchs[1]
 			else
 				error("unknown " .. src:sub(match_pos))

@@ -68,16 +68,19 @@ qfac_1 qfac_2 ... qfac_np qfac_n =
 
 fac? =
 	[syntax]
-	fac | //
+	&T1 fac
+	&T1 /\(\)/
 	[regex]
 	/\({fac}\)\?/
 
 fac* =
 	[syntax]
 	&T1 fac next(fac)
-	&T1 //
+	&T1 /\(\)/
 	[regex]
 	/\({fac}\)*/
 
 fac+ = fac fac*
+
+(rule) = &T1 rule
 
