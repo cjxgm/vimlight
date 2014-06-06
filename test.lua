@@ -3,8 +3,6 @@ local rule = require 'rule'
 local analyzer = require 'analyzer'
 
 local r = rule [[
-	comment = /#.*\n/ | /#.*$/
-
 	&id = /%a%w*/
 	typed_name = id{Type} id
 ]]

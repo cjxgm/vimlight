@@ -1,6 +1,7 @@
 
 local lexer = function(src)
 	local src_len = #src
+	local line_no = 1
 
 	local match_pos = 1
 	local matchs = {}
@@ -13,12 +14,25 @@ local lexer = function(src)
 		end
 	end
 
+	local blank = function()
+		if match("[ \t]+") then			-- space
+			return true
+		end
+		if match("\n+") then			-- new line
+			line_no = line_no + 1
+			return true
+		end
+		if match("#.-\n") then			-- comment until new line
+			line_no = line_no + 1
+			return true
+		end
+		if match("#.*$") then			-- comment until eof
+			return true
+		end
+	end
+
 	local blanks = function()
-		while match_pos <= src_len		-- not eof
-			and (match("%s+")			-- space
-				or match("#.-[\n]")		-- comment
-				or match("#.*"))		-- last comment without newline
-		do end
+		while blank() do end
 	end
 
 	local lex = function()
@@ -45,7 +59,12 @@ local lexer = function(src)
 		end
 	end
 
-	return lex
+	return function()
+		-- to make sure lex() is called before reading line_no
+		return (function(tp, id)
+			return tp, id, line_no
+		end)(lex())
+	end
 end
 
 return lexer
