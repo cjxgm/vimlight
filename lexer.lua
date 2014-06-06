@@ -43,7 +43,9 @@ local lexer = function(src)
 			elseif match("/") then		-- regex
 				local regex = ""
 				while true do
-					if not match(".-/") then error("wrong regex") end
+					if not match(".-/") then
+						error(("[%d]: regex not ended with /"):format(line_nr))
+					end
 					regex = regex .. matchs[1]
 					if matchs[1]:sub(-2, -2) ~= '\\' then	-- ignore escape [[\/]]
 						break
@@ -53,7 +55,8 @@ local lexer = function(src)
 			elseif match("[;=?*+|&{}]") then	-- symbols
 				return 'sym', matchs[1]
 			else
-				error("unknown " .. src:sub(match_pos))
+				error(("[%d] unrecognized character \"%s\""):format(
+						line_nr, src:sub(match_pos, match_pos)))
 				break
 			end
 		end
