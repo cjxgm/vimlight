@@ -1,0 +1,83 @@
+# vim: ft=dosini
+
+# syntax
+
+## from lexer
+id = /\I\i*/
+regex = /\/.*\//[escaping \\/]
+
+## for parser
+all = syntax*
+
+syntax = contained name rule
+contained = '&'?
+name = id color?
+color = '{' id '}'
+
+rule = seq ('|' seq)*
+seq = qfac+
+#-> qfac = quantized factor
+qfac = fac quantity?
+#-> fac = factor
+fac = atom | '(' rule ')'
+atom = name | pattern
+pattern = regex color?
+quantity = '?' | '*' | '+'
+
+
+# semantics
+
+name rule =
+	[syntax]
+	"syntax match $name" rule
+	[regex]
+	rule
+
+&name rule =
+	[syntax]
+	"syntax match $name contained" rule
+	[regex]
+	rule
+
+name{color} =
+	name
+	"highlight link $name $color"
+
+pattern{color} =
+	&T1 pattern
+	"highlight link $T1 $color"
+
+name seq_1 | seq_2 | ... | seq_n =
+	[syntax]
+	name seq_n
+	...
+	name seq_2
+	name seq_1
+	[regex]
+	/\({seq_1}\)\|\({seq_2}\)\|...\|\({seq_n}\)/
+
+qfac_1 qfac_2 ... qfac_np qfac_n =
+	[regex]
+	/\({T1}\)\({T2}\)...\({Tnp}\)\({Tn}\)/
+	[syntax]
+	&T1  qfac_1 next($qfac_2)
+	&T2  qfac_2 next($qfac_3)
+	&Tnp qfac_np next($qfac_n)
+	&Tn  qfac_n
+	&T0  /{T0}/ contains(T1, T2, ..., Tnp, Tn)
+
+fac? =
+	[syntax]
+	fac | //
+	[regex]
+	/\({fac}\)\?/
+
+fac* =
+	[syntax]
+	&T1 fac next(fac)
+	&T1 //
+	[regex]
+	/\({fac}\)*/
+
+fac+ = fac fac*
+
