@@ -141,6 +141,8 @@ local parser = function(lex)
 		match_or_die('sym', '=')
 		advance_or_die()
 		t.rule = rule()
+		match_or_die('sym', ';')
+		advance()
 
 		return node('syntax', t)
 	end

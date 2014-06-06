@@ -9,7 +9,7 @@ regex = /\/.*\//[escaping \\/]
 ## for parser
 all = syntax*
 
-syntax = tmp name /=/ rule
+syntax = tmp name /=/ rule /;/
 tmp = '&'?
 name = id color?
 color = '{' id '}'

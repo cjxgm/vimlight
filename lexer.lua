@@ -50,7 +50,7 @@ local lexer = function(src)
 					end
 				end
 				return 're', regex:sub(1, -2)
-			elseif match("[=?*+|&{}]") then	-- symbols
+			elseif match("[;=?*+|&{}]") then	-- symbols
 				return 'sym', matchs[1]
 			else
 				error("unknown " .. src:sub(match_pos))

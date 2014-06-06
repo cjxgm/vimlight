@@ -14,14 +14,14 @@ dump = function(tbl, level)
 		local prefix = ("%s%s%s = "):format(indent, indentation, kname)
 		local t = type(v)
 		if t == "table" then
-			s = s .. prefix .. dump(v, level+1)
+			s = s .. ("%s%s,\n"):format(prefix, dump(v, level+1))
 		elseif t == "string" then
 			s = s .. ("%s%q,\n"):format(prefix, v)
 		else
 			s = s .. ("%s%s,\n"):format(prefix, v)
 		end
 	end
-	s = s .. indent .. "},\n"
+	s = s .. indent .. "}"
 	return s
 end
 
