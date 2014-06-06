@@ -44,12 +44,15 @@ local lexer = function(src)
 				local regex = ""
 				while true do
 					if not match(".-/") then
-						error(("[%d]: regex not ended with /"):format(line_nr))
+						error(("[%d]: regex not ended with /")
+								:format(line_nr))
 					end
 					regex = regex .. matchs[1]
-					if matchs[1]:sub(-2, -2) ~= '\\' then	-- ignore escape [[\/]]
-						break
-					end
+
+					-- not escaping [[\/]]
+					if regex:sub(-2, -2) ~= '\\' then break end
+					-- escaping [[\/]]
+					regex = regex:sub(1, -3) .. "/"
 				end
 				return 're', regex:sub(1, -2)
 			elseif match("[;=?*+|&{}]") then	-- symbols
