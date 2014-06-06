@@ -9,10 +9,22 @@ regex = /\/.*\//[escaping \\/]
 ## for parser
 all = syntax*
 
-syntax = contained name rule
-contained = '&'?
+syntax = tmp name rule
+tmp = '&'?
 name = id color?
 color = '{' id '}'
+
+rule = seq
+seq = qfac+
+qfac = fac
+fac = atom
+atom = name | pattern
+pattern = regex color?
+
+
+
+
+
 
 rule = seq ('|' seq)*
 seq = qfac+
