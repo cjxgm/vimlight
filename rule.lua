@@ -6,9 +6,9 @@ return function(src)
 	local lex = lexer(src)
 	--[[ XXX lexer debugger
 	while true do
-		local tktp, tkid, tkno = lex()
+		local tktp, tkid, tknr = lex()
 		if not tktp then break end
-		print(tkno, tktp, tkid)
+		print(tknr, tktp, tkid)
 	end
 	--]]
 	local parse = parser(lex)

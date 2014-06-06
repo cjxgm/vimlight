@@ -1,7 +1,7 @@
 
 local lexer = function(src)
 	local src_len = #src
-	local line_no = 1
+	local line_nr = 1
 
 	local match_pos = 1
 	local matchs = {}
@@ -19,11 +19,11 @@ local lexer = function(src)
 			return true
 		end
 		if match("\n+") then			-- new line
-			line_no = line_no + 1
+			line_nr = line_nr + 1
 			return true
 		end
 		if match("#.-\n") then			-- comment until new line
-			line_no = line_no + 1
+			line_nr = line_nr + 1
 			return true
 		end
 		if match("#.*$") then			-- comment until eof
@@ -60,9 +60,9 @@ local lexer = function(src)
 	end
 
 	return function()
-		-- to make sure lex() is called before reading line_no
+		-- to make sure lex() is called before reading line_nr
 		return (function(tp, id)
-			return tp, id, line_no
+			return tp, id, line_nr
 		end)(lex())
 	end
 end

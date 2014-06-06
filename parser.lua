@@ -2,7 +2,7 @@
 local parser = function(lex)
 	local tktp = ''	-- token type
 	local tkid = ''	-- token identity
-	local tkno = 0	-- token line no.
+	local tknr = 0	-- token line no.
 
 	local node = function(tp, tbl)
 		tbl.tp = tp
@@ -10,7 +10,7 @@ local parser = function(lex)
 	end
 
 	local advance = function()
-		tktp, tkid, tkno = lex()
+		tktp, tkid, tknr = lex()
 	end
 
 	local match = function(tp, id)
@@ -22,20 +22,20 @@ local parser = function(lex)
 	local tkdump = function()	-- token dump
 		print('token dump:')
 		while tktp do		-- token dump
-			print('', tkno, tktp, tkid)
+			print('', tknr, tktp, tkid)
 			advance()
 		end
 	end
 
 	local die = function(tp, id)
-		local no = tkno
+		local nr = tknr
 		tkdump()
 		if tp or id then
 			local errid = id and ( "%q" ):format(id) or ''
 			local errtp = tp and ("[%s]"):format(tp) or ''
-			error(("error[%d]: %s%s expected"):format(no, errid, errtp))
+			error(("error[%d]: %s%s expected"):format(nr, errid, errtp))
 		else
-			error(("error[%d]: nothing expected, WTF!??"):format(no))
+			error(("error[%d]: nothing expected, WTF!??"):format(nr))
 		end
 	end
 
