@@ -1,6 +1,7 @@
 
-local dump
 local indentation = "    "
+
+local dump
 dump = function(tbl, level)
 	local s = ""
 	level = level or 0
