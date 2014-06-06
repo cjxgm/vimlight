@@ -1,17 +1,20 @@
 
-local rule = require 'rule'
+local lexer = require 'lexer'
+local parser = require 'parser'
 local analyzer = require 'analyzer'
 local dump = require 'dump'
 
-local r = rule [[
+local lex = lexer [[
 	&id = /%a%w*/;
 	typed_name = id{Type} id id id;
 ]]
+local parse = parser(lex)
+local ast = parse()
 
-print(dump(r))
+print(dump(ast))
 
 --[[
-local analyze = analyzer(r)
+local analyze = analyzer(ast)
 
 analyze [[
 	type name yes no
@@ -20,3 +23,4 @@ analyze [[
 	q x
 ]]
 --]]
+
