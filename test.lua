@@ -6,7 +6,9 @@ lex = lexer [[
 &ppp{Constant}	/+++/
 &pp {Statement}	/++/
 &p  {Comment}	/+/
-pnp		ppp | pp | p
+&pnp			ppp | pp | p
+&pt {Error}		/+---/
+d				pt | pnp
 ]]
 
 parse = parser(lex)
@@ -16,7 +18,8 @@ for _,s in ipairs(ss) do
 	ssname[s.name.name] = s
 end
 
-local regex = function(rs)
+local regex
+regex = function(rs)
 	local re = function(r)
 		if r.regex then return r.regex end
 		return regex(ssname[r.name].rule)
@@ -24,9 +27,8 @@ local regex = function(rs)
 	if #rs == 1 then return re(rs[1]) end
 
 	local res = {}
-	for i=#rs,1,-1 do
-		local r = rs[i]
-		res[#rs-i+1] = ([[\(%s\)]]):format(regex(r))
+	for i,r in ipairs(rs) do
+		res[#res+1] = ([[\(%s\)]]):format(re(r))
 	end
 	return table.concat(res, [[\|]])
 end

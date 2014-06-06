@@ -7,14 +7,16 @@ regex = /\/.*\//[escaping \\/]
 ## for parser
 all = syntax*
 
-syntax = contained? name rule
-contained = '&'
+syntax = contained name rule
+contained = '&'?
 name = id color?
+pattern = regex color?
+atom = name | pattern
 color = '{' id '}'
 
-rule = branch ('|' branch)*
-#branch = atom repeat?
-branch = atom
-atom = name | regex
-#repeat = '?' | '*' | '+'
+rule = seq ('|' seq)*
+seq = case+
+case = fac rep?
+fac = atom | '(' rule ')'
+rep = '?' | '*' | '+'
 
