@@ -2,7 +2,7 @@
 local parser = function(lex)
 	local tktp = ''	-- token type
 	local tkid = ''	-- token identity
-	local tknr = 0	-- token line no.
+	local tknr = 0	-- token line number
 
 	local node = function(tp, tbl)
 		tbl.tp = tp
@@ -21,14 +21,14 @@ local parser = function(lex)
 
 	local tkdump = function()	-- token dump
 		print('token dump:')
-		while tktp do		-- token dump
+		while tktp do		-- not eof
 			print('', tknr, tktp, tkid)
 			advance()
 		end
 	end
 
 	local die = function(tp, id)
-		local nr = tknr
+		local nr = tknr		-- tkdump will advance tknr till eof
 		tkdump()
 		if tp or id then
 			local errid = id and ( "%q" ):format(id) or ''
