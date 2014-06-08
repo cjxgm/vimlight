@@ -5,8 +5,9 @@ local analyzer = require 'analyzer'
 local dump = require 'dump'
 
 local lex = lexer [[
-	&id{Statement} = /%a%w*/;
-	typed_name = id{Type} id id id;
+	&id = /%a%w*/;
+	&type{Type} = id (/</ type />/)?;
+	typed_name = type id | /(/ type /)/ id;
 ]]
 local parse = parser(lex)
 local ast = parse()

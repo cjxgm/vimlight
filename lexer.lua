@@ -55,7 +55,7 @@ local lexer = function(src)
 					regex = regex:sub(1, -3) .. "/"
 				end
 				return 're', regex:sub(1, -2)
-			elseif match("[;=?*+|&{}]") then	-- symbols
+			elseif match("[;=?*+|&{}()]") then	-- symbols
 				return 'sym', matchs[1]
 			else
 				error(("[%d] unrecognized character \"%s\""):format(

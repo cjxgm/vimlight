@@ -71,38 +71,59 @@ local parser = function(lex)
 
 	local name = function(try)
 		if not match_or_die('id', nil, try) then return end
-		local t = { id = tkid }
+		local n = { id = tkid }
 		advance()
 
-		t.color = color(true)
-		return node('name', t)
+		n.color = color(true)
+		return node('name', n)
 	end
 
 	local pattern = function(try)
 		if not match_or_die('re', nil, try) then return end
-		local t = { id = tkid }
+		local n = { id = tkid }
 		advance()
 
-		t.color = color(true)
-		return node('pattern', t)
+		n.color = color(true)
+		return node('pattern', n)
 	end
 
 	local atom = function(try)
-		local t = name(true)
-		if t then return t end
+		local n = name(true)
+		if n then return n end
 
-		local t = pattern(true)
-		if t then return t end
+		local n = pattern(true)
+		if n then return n end
 
 		if not try then die('atom', 'name or pattern') end
 	end
 
+	local rule
 	local fac = function(try)
+		if match('sym', '(') then
+			advance()
+			local n = rule()
+			match_or_die('sym', ')')
+			advance()
+			return n
+		end
 		return atom(try)
 	end
 
 	local qfac = function(try)
-		return fac(try)
+		local n = fac(try)
+		if not n then return end
+
+		local quantity = function()
+			if match('sym', '+') then return '+' end
+			if match('sym', '*') then return '*' end
+			if match('sym', '?') then return '?' end
+		end
+		local q = quantity()
+		if q then
+			advance()
+			n = node('quantity', { q, n })
+		end
+		return n
 	end
 
 	local function seq(try)
@@ -114,8 +135,17 @@ local parser = function(lex)
 		return node('seq', { list(try) })
 	end
 
-	local rule = function(try)
-		return seq(try)
+	rule = function(try)
+		local function list(try)
+			local n = seq(try)
+			if not n then return end
+			if match('sym', '|') then
+				advance()
+				return n, list()
+			end
+			return n
+		end
+		return node('rule', { list(try) })
 	end
 
 	local tmp = function()	-- no need to try
