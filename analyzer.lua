@@ -12,6 +12,16 @@ local analyzer = function(ast)
 	local exports = {}
 	local rule_action = {}
 
+	local tmpname
+	do
+		t = 0
+		tmpname = function()
+			t = t + 1
+			return "T" .. t
+		end
+	end
+
+
 	local rule = function(r)
 		local action = rule_action[r.tp]
 		assert(action, "cannot deal with " .. r.tp)
@@ -48,6 +58,40 @@ local analyzer = function(ast)
 	rule_action.pattern = function(r)
 		local instr = { op='match', r.id }
 		if r.color then instr = { op='color', r.color[1], instr } end
+		return instr
+	end
+
+	rule_action['?'] = function(r)
+		return { op='br', rule(r[1]), {} }
+	end
+
+	rule_action['*'] = function(r)
+		local t = tmpname()
+		rules[t] = {
+			op='br',
+			{
+				op='seq',
+				rule(r[1]),
+				{ op='call', t }
+			},
+			{}
+		}
+		return { op='call', t }
+	end
+
+	rule_action['+'] = function(r)
+		local t = tmpname()
+		local instr = rule(r[1])
+		rules[t] = {
+			op='br',
+			{
+				op='seq',
+				instr,
+				{ op='call', t }
+			},
+			{}
+		}
+		instr = { op='seq', instr, { op='call', t} }
 		return instr
 	end
 

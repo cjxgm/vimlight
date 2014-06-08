@@ -121,7 +121,7 @@ local parser = function(lex)
 		local q = quantity()
 		if q then
 			advance()
-			n = node('quantity', { q, n })
+			n = node(q, { n })
 		end
 		return n
 	end

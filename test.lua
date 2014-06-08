@@ -6,7 +6,7 @@ local dump = require 'dump'
 
 local lex = lexer [[
 	&id = /%a%w*/;
-	&type{Type} = id (/</ type />/)?;
+	&type{Type} = id (/</ type />/)*;
 	typed_name = type id | /(/ type /)/ id;
 ]]
 local parse = parser(lex)
