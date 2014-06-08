@@ -139,7 +139,7 @@ local analyzer = function(ast)
 		local y1, x1 = pos2d(s)
 		local y2, x2 = pos2d(e-1)	-- e: pos of the char after the matched
 		x2 = x2 + 1
-		color_marks[#color_marks+1] = { y1, x1, y2, x2, color }
+		color_marks[#color_marks+1] = { y1, x1, y2, x2, color, s }
 	end
 
 	local function execute(instr)
