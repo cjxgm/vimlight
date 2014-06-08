@@ -2,6 +2,7 @@
 local lexer = require 'lexer'
 local parser = require 'parser'
 local analyzer = require 'analyzer'
+local highlighter = require 'highlighter'
 local dump = require 'dump'
 
 local lex = lexer [[
@@ -14,7 +15,6 @@ local lex = lexer [[
 ]]
 local parse = parser(lex)
 local ast = parse()
-
 print(dump(ast))
 
 local analyze = analyzer(ast)
@@ -31,6 +31,22 @@ local colors = analyze [[
 		return a.size();
 	}
 ]]
-
 print(dump(colors))
+
+local highlight = highlighter()
+highlight(colors)
+
+
+highlight(analyze([[
+	int add(int a, int b)
+	{
+	}
+
+	int main()
+	{
+		vector<int> a { 1, 2 };
+		printf("hello, world! %d\n", add(1, 2));
+		return a.size();
+	}
+]]))
 

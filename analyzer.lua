@@ -7,11 +7,9 @@ local map = function(f, ...)				-- XXX: put into some module?
 	return map(...)
 end
 
-local array_extend = function(t, t2)		-- XXX: put into some module?
-	local i = #t + 1
-	for _,v in ipairs(t2) do
+local extend = function(t, t2)		-- XXX: put into some module?
+	for i,v in pairs(t2) do
 		t[i] = v
-		i = i + 1
 	end
 	return t
 end
@@ -139,7 +137,7 @@ local analyzer = function(ast)
 		local y1, x1 = pos2d(s)
 		local y2, x2 = pos2d(e-1)	-- e: pos of the char after the matched
 		x2 = x2 + 1
-		color_marks[#color_marks+1] = { y1, x1, y2, x2, color, s }
+		color_marks[s] = { y1, x1, y2, x2, color }
 	end
 
 	local function execute(instr)
@@ -201,7 +199,7 @@ local analyzer = function(ast)
 		while match_pos <= src_len do
 			color_marks = {}
 			if execute(instr) then
-				array_extend(colors, color_marks)
+				extend(colors, color_marks)
 			else
 				match_pos = match_pos + 1
 			end
