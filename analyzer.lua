@@ -156,10 +156,6 @@ local analyzer = function(ast)
 
 	-- all ops functions return true when success
 	ops.seq = function(...)
-		print('seq')
-		print(map(dump, ...))
-		print()
-
 		local function seq(instr, ...)
 			if not instr then return true end
 			if not execute(instr) then return end
@@ -169,10 +165,6 @@ local analyzer = function(ast)
 	end
 
 	ops.br = function(...)
-		print('seq')
-		print(map(dump, ...))
-		print()
-
 		local function br(instr, ...)
 			if not instr then return end
 			if execute(instr) then return true end
@@ -182,16 +174,11 @@ local analyzer = function(ast)
 	end
 
 	ops.call = function(name)
-		print('call', name)
-
 		return execute(name)
 	end
 
 	ops.match = function(pattern)
-		print('match', pattern)
-
-		local pos = select(-1, src:match(
-				("^(%s)()"):format(pattern), match_pos))
+		local pos = select(-1, src:match("^%s*(" .. pattern .. ")()", match_pos))
 		if pos then
 			match_pos = pos
 			return true
@@ -199,8 +186,8 @@ local analyzer = function(ast)
 	end
 
 	ops.color = function(color, instr)
-		print('color', dump(instr))
-		print()
+		-- skip blanks
+		match_pos = src:match("^%s*()", match_pos)
 
 		local s = match_pos
 		if execute(instr) then
@@ -214,10 +201,8 @@ local analyzer = function(ast)
 		while match_pos <= src_len do
 			color_marks = {}
 			if execute(instr) then
-				print("ok!")
 				array_extend(colors, color_marks)
 			else
-				print("fail!")
 				match_pos = match_pos + 1
 			end
 		end
