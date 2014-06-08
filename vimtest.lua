@@ -1,5 +1,23 @@
 
-local hl,hlclear = (require 'highlight')()
+local lexer = require 'lexer'
+local parser = require 'parser'
+local analyzer = require 'analyzer'
+local highlighter = require 'highlighter'
+local dump = require 'dump'
+
+local lex = lexer [[
+	&id = /%a%w*/;
+	&type{Type} = id (/</ type />/)*;
+	typed_name = /return/ id	# so that return won't be regarded as type
+				| type id
+				| /%(/ type /%)/ id
+	;
+]]
+local parse = parser(lex)
+local ast = parse()
+print(dump(ast))
+local analyze = analyzer(ast)
+local highlight = highlighter()
 
 local src = function()
 	local buf = vim.buffer()
@@ -8,46 +26,7 @@ local src = function()
 	return s
 end
 
-local pos2d = function(src, pos)
-	local l = 1
-	local lastp = 1
-	for p in src:gmatch("\n()") do
-		if pos >= p then l = l + 1 lastp = p
-		else break end
-	end
-	return l, pos - lastp + 1
+return function()
+	highlight(analyze(src()))
 end
-
-local matched_region = function(src, pattern)
-	local rs = {}
-	for m,p in src:gmatch("(" .. pattern .. ")()") do
-		local sp = p - m:len()
-		local ep = p - 1
-		rs[{sp, ep}] = true
-	end
-	return rs
-end
-
-local highlight_regions = function(src, rs, color)
-	for r in pairs(rs) do
-		local l1, c1 = pos2d(src, r[1])
-		local l2, c2 = pos2d(src, r[2])
-		hl(l1, c1, l2, c2, color)
-	end
-end
-
-local highlight_match = function(pattern, color)
-	local s = src()
-	highlight_regions(s, matched_region(s, pattern), color)
-end
-
-local hi = function()
-	hlclear()
-	highlight_match("%a%d", "Comment")
-	hl(1, 3, 1, 5, "Type")
-	hl(2, 2, 3, 8, "Comment")
-end
-
-return hi
-
 

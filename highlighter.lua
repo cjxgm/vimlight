@@ -32,6 +32,11 @@ local highlighter = function()
 				add(i, table.unpack(color))
 			end
 		end
+		for i in pairs(last_colors) do
+			if not colors[i] then
+				del(i)
+			end
+		end
 		last_colors = colors
 	end
 
