@@ -14,12 +14,13 @@ tmp = '&'?
 name = id color?
 color = '{' id '}'
 
-rule = seq
+rule = seq ('|' seq)*
 seq = qfac+
-qfac = fac
-fac = atom
+qfac = fac quantity?
+fac = atom | '(' rule ')'
 atom = name | pattern
 pattern = regex color?
+quantity = /[?*+]/
 
 
 

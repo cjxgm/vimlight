@@ -105,19 +105,13 @@ local parser = function(lex)
 		return fac(try)
 	end
 
-	local seq = function(try)
-		local node_qfac = qfac(try)
-		if not node_qfac then return end
-
-		while true do
-			local node_qfac2 = qfac(true)
-			if node_qfac2 then
-				node_qfac2.prev = node_qfac
-				node_qfac = node_qfac2
-			else
-				return node_qfac
-			end
+	local function seq(try)
+		local function list(try)
+			local n = qfac(try)
+			if not n then return end
+			return n, list(true)
 		end
+		return node('seq', { list(try) })
 	end
 
 	local rule = function(try)
@@ -147,22 +141,17 @@ local parser = function(lex)
 		return node('syntax', t)
 	end
 
-	local all = function()
-		advance()
-
-		local t
-		while true do
-			local node_syntax = syntax(true)
-			if node_syntax then
-				node_syntax.prev = t
-				t = node_syntax
-			else
-				return t
-			end
+	local function all()
+		local function list()
+			local n = syntax(true)
+			if not n then return end
+			return n, list()
 		end
+		return { list() }
 	end
 
 	local parse = function()
+		advance()
 		return all()
 	end
 

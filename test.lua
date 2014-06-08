@@ -5,7 +5,7 @@ local analyzer = require 'analyzer'
 local dump = require 'dump'
 
 local lex = lexer [[
-	&id = /%a%w*/;
+	&id{Statement} = /%a%w*/;
 	typed_name = id{Type} id id id;
 ]]
 local parse = parser(lex)
@@ -13,8 +13,8 @@ local ast = parse()
 
 print(dump(ast))
 
---[[
 local analyze = analyzer(ast)
+--[[
 
 analyze [[
 	type name yes no
