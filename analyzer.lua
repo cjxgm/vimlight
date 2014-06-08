@@ -1,11 +1,21 @@
 
-local map = function(f, ...)		-- XXX: put into some module?
+local map = function(f, ...)				-- XXX: put into some module?
 	local function map(x, ...)
 		if x == nil then return end
 		return f(x), map(...)
 	end
 	return map(...)
 end
+
+local array_extend = function(t, t2)		-- XXX: put into some module?
+	local i = #t + 1
+	for _,v in ipairs(t2) do
+		t[i] = v
+		i = i + 1
+	end
+	return t
+end
+
 
 local analyzer = function(ast)
 	local rules = {}
@@ -103,7 +113,122 @@ local analyzer = function(ast)
 	print(dump(exports))
 	print(dump(rules))
 
-	local analyze = function(src)
+
+
+
+	local ops = {}		-- operations
+	local match_pos
+	local src, src_len
+	local color_marks	-- colorize when matching
+	local colors		-- when match success, move color_marks here
+
+	local colorize = function(s, e, color)
+		local pos2d = function(pos)	-- convert 1d address into 2d coordinates
+			local y = 1
+			local lastp = 1
+			for p in src:gmatch("\n()") do
+				if pos >= p then
+					y = y + 1
+					lastp = p
+				else
+					break
+				end
+			end
+			return y, pos - lastp + 1
+		end
+		local y1, x1 = pos2d(s)
+		local y2, x2 = pos2d(e-1)	-- e: pos of the char after the matched
+		x2 = x2 + 1
+		color_marks[#color_marks+1] = { y1, x1, y2, x2, color }
+	end
+
+	local function execute(instr)
+		if type(instr) == 'string' then
+			local i = rules[instr]
+			assert(i, "no such function called " .. instr)
+			return execute(i)
+		end
+		if not instr.op then return true end
+		local op = ops[instr.op]
+		assert(op, "unknown instruction " .. instr.op)
+		return op(table.unpack(instr))
+	end
+
+	-- all ops functions return true when success
+	ops.seq = function(...)
+		print('seq')
+		print(map(dump, ...))
+		print()
+
+		local function seq(instr, ...)
+			if not instr then return true end
+			if not execute(instr) then return end
+			return seq(...)
+		end
+		return seq(...)
+	end
+
+	ops.br = function(...)
+		print('seq')
+		print(map(dump, ...))
+		print()
+
+		local function br(instr, ...)
+			if not instr then return end
+			if execute(instr) then return true end
+			return br(...)
+		end
+		return br(...)
+	end
+
+	ops.call = function(name)
+		print('call', name)
+
+		return execute(name)
+	end
+
+	ops.match = function(pattern)
+		print('match', pattern)
+
+		local pos = select(-1, src:match(
+				("^(%s)()"):format(pattern), match_pos))
+		if pos then
+			match_pos = pos
+			return true
+		end
+	end
+
+	ops.color = function(color, instr)
+		print('color', dump(instr))
+		print()
+
+		local s = match_pos
+		if execute(instr) then
+			colorize(s, match_pos, color)
+			return true
+		end
+	end
+
+	local gexecute = function(instr)
+		match_pos = 1
+		while match_pos <= src_len do
+			color_marks = {}
+			if execute(instr) then
+				print("ok!")
+				array_extend(colors, color_marks)
+			else
+				print("fail!")
+				match_pos = match_pos + 1
+			end
+		end
+	end
+
+	local analyze = function(source)
+		src = source
+		src_len = src:len()
+		colors = {}
+		for _,v in ipairs(exports) do gexecute(v) end
+		return colors
 	end
 
 	return analyze
