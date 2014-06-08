@@ -126,7 +126,7 @@ local parser = function(lex)
 		return n
 	end
 
-	local function seq(try)
+	local seq = function(try)
 		local function list(try)
 			local n = qfac(try)
 			if not n then return end
@@ -171,7 +171,7 @@ local parser = function(lex)
 		return node('syntax', t)
 	end
 
-	local function all()
+	local all = function()
 		local function list()
 			local n = syntax(true)
 			if not n then return end
