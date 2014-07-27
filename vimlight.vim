@@ -11,21 +11,24 @@ endf
 function vimlight#done()
 "	echo "done"
 	lua vimlight:done()
+	if exists("s:updatetime")
+		let &updatetime = s:updatetime
+		unlet s:updatetime
+	endif
+	redraw!
 endf
 
 function vimlight#request()
 "	echo "request"
-	lua vimlight:request()
-	if !exists("s:updatetime")
-		let s:updatetime = &updatetime
-		set updatetime=1000
+	if exists("s:updatetime")	" only when modified will this exist
+		lua vimlight:request()
 	endif
 endf
 
-function vimlight#redraw()
+function vimlight#modified()
 	if !exists("s:updatetime")
-		let &updatetime = s:updatetime
+		let s:updatetime = &updatetime
+		set updatetime=300
 	endif
-	redraw!
 endf
 
