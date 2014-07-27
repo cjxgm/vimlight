@@ -53,6 +53,10 @@ local lexer = function(src)
 					if regex:sub(-2, -2) ~= '\\' then break end
 					-- escaping [[\/]]
 					regex = regex:sub(1, -3) .. "/"
+					-- escaping [[\n]]
+					regex = regex:gsub("\\n", "\n")
+					-- escaping [[\\]]
+					regex = regex:gsub([[\\]], [[\]])
 				end
 				return 're', regex:sub(1, -2)
 			elseif match("[;=?*+|&{}()]") then	-- symbols

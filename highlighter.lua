@@ -1,5 +1,7 @@
 
 local highlighter = function()
+	if not vim then vim = { command=print } end
+
 	local last_colors = {}
 
 	local same = function(color1, color2)
@@ -8,8 +10,6 @@ local highlighter = function()
 		end
 		return true
 	end
-
-	-- local vim = { command=print }
 
 	local add = function(i, y1, x1, y2, x2, clr)
 		vim.command(([[syn region lighterH%d start=+\%%%dl\%%%dc+ end=+\%%%dl\%%%dc+]]):format(i, y1, x1, y2, x2))

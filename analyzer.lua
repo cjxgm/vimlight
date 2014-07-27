@@ -108,8 +108,8 @@ local analyzer = function(ast)
 
 	--DEBUG
 	local dump = require 'dump'
-	print(dump(exports))
-	print(dump(rules))
+	--print(dump(exports))
+	--print(dump(rules))
 
 
 
