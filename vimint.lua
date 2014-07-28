@@ -3,7 +3,7 @@ local vl = {}	-- vl = vimlight
 
 vl.new = function(this)
 	return setmetatable({
-		highlight = highlighter()
+		highlight = highlighter(vim)
 	}, { __index = this })
 end
 

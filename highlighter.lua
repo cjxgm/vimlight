@@ -1,5 +1,5 @@
 
-local highlighter = function()
+local highlighter = function(vim)
 	if not vim then vim = { command=print } end
 
 	local last_colors = {}

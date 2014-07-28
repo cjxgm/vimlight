@@ -64,16 +64,13 @@ local lexer = function(src)
 			else
 				error(("[%d] unrecognized character \"%s\""):format(
 						line_nr, src:sub(match_pos, match_pos)))
-				break
 			end
 		end
 	end
 
 	return function()
-		-- to make sure lex() is called before reading line_nr
-		return (function(tp, id)
-			return tp, id, line_nr
-		end)(lex())
+		local tp, id = lex()
+		return tp, id, line_nr
 	end
 end
 
