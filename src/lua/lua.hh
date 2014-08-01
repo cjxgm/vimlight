@@ -98,6 +98,15 @@ namespace lua
 			}
 		}
 
+		template <class First, class ...Rest>
+		void push_all(First&& first, Rest&& ...rest)
+		{
+			push(std::forward<First>(first));
+			push_all(std::forward<Rest>(rest)...);
+		}
+		void push_all() {}
+
+
 		template <class T>
 		void get(T*& ptr, int index)
 		{
@@ -125,6 +134,20 @@ namespace lua
 			if (!lua_iscfunction(rs, index))
 				error("c function expected");
 			func = lua_tocfunction(rs, index);
+		}
+
+
+		void call(int nresult, int narg)
+		{
+			lua_call(rs, narg, nresult);
+		}
+
+		template <class ...Args>
+		void call(int nresult, cfunc_type func, Args&& ...args)
+		{
+			push(func);
+			push_all(std::forward<Args>(args)...);
+			call(nresult, sizeof...(args));
 		}
 
 	private:
