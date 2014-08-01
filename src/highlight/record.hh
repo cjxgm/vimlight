@@ -18,7 +18,7 @@ namespace vimlight
 
 		inline namespace record_helper
 		{
-			bool operator==(const record& lhs, const record& rhs)
+			inline bool operator==(const record& lhs, const record& rhs)
 			{
 				return
 					(lhs.y1 == rhs.y1) &&
@@ -28,7 +28,7 @@ namespace vimlight
 					(lhs.name == rhs.name);
 			}
 
-			bool operator!=(const record& lhs, const record& rhs)
+			inline bool operator!=(const record& lhs, const record& rhs)
 			{
 				return
 					(lhs.y1 != rhs.y1) ||
