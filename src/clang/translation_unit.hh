@@ -14,16 +14,24 @@ namespace clang
 		using source_type = unsaved_file::source_type;
 		using index_type = clang::index;
 
-		translation_unit(const index_type& index, const source_type& src)
+		translation_unit(const index_type& index, const source_type& src="")
 		{
 			clang::unsaved_file f(src);
+			const char* argv[] = { "-std=gnu++11" };
 			set(c::translation_unit::create_from_source_file(
-					index, f.name(), 0, nullptr, 1, f));
+					index, f.name(), 1, argv, 1, f));
 		}
 
 		~translation_unit() override { if (owned) c::translation_unit::dispose(get()); }
 
-		cursor cursor() { return clang::cursor(c::translation_unit::get_cursor(get())); }
+		void parse(const source_type& src)
+		{
+			clang::unsaved_file f(src);
+			auto opt = c::options::default_reparse(get());
+			c::translation_unit::reparse(get(), 1, f, opt);
+		}
+
+		cursor cursor() { return c::translation_unit::get_cursor(get()); }
 	};
 };
 

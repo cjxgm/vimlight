@@ -40,10 +40,14 @@ namespace clang
 // return statement.
 //
 // usage:
-// 		auto func() RETURN(1+1)
+// 		auto func()
+// 			RETURN(1+1);
 //
 // equivalent to c++14 code:
-// 		decltype(auto) func() { return 1+1; }
+// 		decltype(auto) func()
+// 		{
+// 			return 1+1;
+// 		}
 //
 #define RETURN(EXPR) -> decltype(EXPR) { return EXPR; }
 
@@ -70,7 +74,7 @@ namespace clang
 #define FORWARD_FUNC(NAME, CNAME) \
 		template <class ...Args> \
 		inline auto NAME (Args&& ...args) \
-			RETURN(clang_ ## CNAME (std::forward<Args>(args)...))
+			RETURN(clang_ ## CNAME (std::forward<Args>(args)...));
 
 
 
@@ -88,6 +92,7 @@ namespace clang
 			FORWARD_FUNC(create_from_source_file, createTranslationUnitFromSourceFile);
 			FORWARD_FUNC(dispose, disposeTranslationUnit);
 			FORWARD_FUNC(get_cursor, getTranslationUnitCursor);
+			FORWARD_FUNC(reparse, reparseTranslationUnit);
 		};
 
 		namespace cursor
@@ -140,6 +145,11 @@ namespace clang
 		namespace unsaved_file
 		{
 			FORWARD_TYPE(UnsavedFile);
+		};
+
+		namespace options
+		{
+			FORWARD_FUNC(default_reparse, defaultReparseOptions);
 		};
 
 
