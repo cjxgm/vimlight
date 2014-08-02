@@ -1,2 +1,4 @@
-hello yeshw
-world nohw
+TypeRef			Type
+NamespaceRef	Namespace
+TemplateRef		Template
+
