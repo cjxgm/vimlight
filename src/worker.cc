@@ -1,4 +1,5 @@
 #include "worker.hh"
+#include "highlight/all.hh"
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -45,6 +46,7 @@ namespace vimlight
 			}
 		};
 
+
 		// a communication channel with worker thread
 		// this is used to tell if the worker thread is
 		// initialized and ready to accept update requests.
@@ -73,12 +75,19 @@ namespace vimlight
 			}
 		};
 
+
+
+
 		void run(command_func_type cmd)
 		{
 			cout << ">>> worker::run " << reinterpret_cast<void*>(cmd) << endl;
 
 			// create worker thread
 			std::thread th([cmd] {
+				vimlight::vim vim(cmd);
+				highlight::group group("hlgroup");
+				vimlight::analyzer analyzer;
+				highlight::delta delta;
 				init::done();
 
 				// main loop
@@ -87,6 +96,9 @@ namespace vimlight
 					cout << ">>> worker::thread <<" << endl
 						<< src << endl
 						<< ">>" << endl;
+
+					auto result = analyzer.parse(src, group);
+					delta.update(result, vim);
 				}
 			});
 			th.detach();
