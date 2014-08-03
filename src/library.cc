@@ -21,6 +21,7 @@ namespace vimlight
 			};
 
 			lib["request"] = [](lua::state& s) {
+				if (!inited) s.error("not initialized.");
 				worker::source_type src;
 				s.get(src, 1);
 				worker::request(src);
