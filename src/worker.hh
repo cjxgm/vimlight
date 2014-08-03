@@ -16,7 +16,7 @@ namespace vimlight
 		void run(command_func_type cmd);
 
 		// request the worker to highlight the source.
-		void request(const source_type& src);
+		void request(source_type src);
 	};
 };
 

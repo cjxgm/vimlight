@@ -1,5 +1,6 @@
 #include "library.hh"
 #include "worker.hh"
+#include <utility>
 
 static lua::library lib;
 static bool inited = false;
@@ -25,7 +26,7 @@ namespace vimlight
 				if (!inited) s.error("not initialized");
 				worker::source_type src;
 				s.get(src, 1);
-				worker::request(src);
+				worker::request(std::move(src));
 				return 0;
 			};
 
