@@ -16,7 +16,7 @@ namespace vimlight
 			coord_type y2, coord_type x2)
 	{
 		std::stringstream ss;
-		ss	<< "syn region lighterH" << idx
+		ss	<< "syn region vimlight" << idx
 			<< " start=+\\%" << y1 << "l\\%" << x1 << "c+"
 			<<   " end=+\\%" << y2 << "l\\%" << x2 << "c+";
 		eval(ss.str());
@@ -25,14 +25,14 @@ namespace vimlight
 	void vim::link(hlindex_type idx, const name_type& name)
 	{
 		std::stringstream ss;
-		ss << "hi link lighterH" << idx << " " << name;
+		ss << "hi link vimlight" << idx << " " << name;
 		eval(ss.str());
 	}
 
 	void vim::clear(hlindex_type idx)
 	{
 		std::stringstream ss;
-		ss << "syn clear lighterH" << idx;
+		ss << "syn clear vimlight" << idx;
 		eval(ss.str());
 	}
 };
