@@ -12,6 +12,10 @@ namespace vimlight
 {
 	namespace worker
 	{
+		// a communication channel with worker thread
+		// this is used to tell the worker thread to update
+		// the highlight. this will pass the last updated
+		// source code to the worker thread.
 		namespace update
 		{
 			using mutex_type = std::mutex;
@@ -19,30 +23,76 @@ namespace vimlight
 			using  lock_type = std::unique_lock<mutex_type>;
 			static mutex_type m;
 			static condv_type cv;
-			static bool request = false;
+			static bool requested = false;
 			static source_type src;
+
+			static source_type wait()
+			{
+				lock_type lock(m);
+				cv.wait(lock, [] { return requested; });
+				requested = false;
+				return std::move(src);
+			}
+
+			static void request(source_type s)
+			{
+				{
+					lock_type lock(m);
+					src = std::move(s);
+					requested = true;
+				}
+				cv.notify_one();
+			}
+		};
+
+		// a communication channel with worker thread
+		// this is used to tell if the worker thread is
+		// initialized and ready to accept update requests.
+		namespace init
+		{
+			using mutex_type = update::mutex_type;
+			using condv_type = update::condv_type;
+			using  lock_type = update::lock_type;
+			static update::mutex_type m;
+			static update::condv_type cv;
+			static bool is_done = false;
+
+			static void wait()
+			{
+				lock_type lock(m);
+				cv.wait(lock, [] { return is_done; });
+			}
+
+			static void done()
+			{
+				{
+					lock_type lock(m);
+					is_done = true;
+				}
+				cv.notify_one();
+			}
 		};
 
 		void run(command_func_type cmd)
 		{
 			cout << ">>> worker::run " << reinterpret_cast<void*>(cmd) << endl;
 
+			// create worker thread
 			std::thread th([cmd] {
-				source_type src;
+				init::done();
+
+				// main loop
 				while (true) {
-					{
-						update::lock_type lock(update::m);
-						update::cv.wait(lock, [] { return update::request; });
-						src = std::move(update::src);
-						update::request = false;
-					}
+					auto src = update::wait();
 					cout << ">>> worker::thread <<" << endl
 						<< src << endl
 						<< ">>" << endl;
 				}
 			});
-
 			th.detach();
+
+			// wait for initialization done
+			init::wait();
 		}
 
 		void request(source_type src)
@@ -51,12 +101,7 @@ namespace vimlight
 				<< src << endl
 				<< ">>" << endl;
 
-			{
-				update::lock_type lock(update::m);
-				update::src = std::move(src);
-				update::request = true;
-			}
-			update::cv.notify_one();
+			update::request(std::move(src));
 		}
 	};
 };
