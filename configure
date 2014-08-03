@@ -1,0 +1,130 @@
+#!/usr/bin/perl -w
+# vim: noet ts=4 sw=4 sts=0 fenc=utf8
+# Licensed under the MIT License. See COPYING for more details.
+# (C) 2014. eXerigumo Clanjor (哆啦比猫/兰威举) <cjxgm@126.com>
+
+
+
+
+my $CC = "clang++";
+my $LD = "clang++";
+my $CCFLAGS = "-std=gnu++11 -march=native -O3 -Wall -fPIC";
+my $LDFLAGS = "-pthread -lclang -shared";
+my $name = "vimlight";
+my $dest = "./$name.so";
+my $test = "lua test.lua $name";
+my @libs = qw(lua);
+my %installs = (
+	"nothing" => "/tmp"
+);
+
+
+
+
+my @dirs;
+my %targets;
+
+sub gen_dep
+{
+	my ($dir) = @_;
+	return if $dir =~ /\/build$/;
+
+	push @dirs, "build/$dir";
+	print "\e[0;32mprocessing \e[0;35m$dir/\n\e[0m";
+
+	for (<$dir/*.cc>) {
+		print "\e[0;32mprocessing \e[1;35m$_\n\e[1;31m";
+		my $deps = `gcc $CCFLAGS -MM "$_"` or die "\e[0m";
+		print "\e[0m";
+		$deps =~ /^([^:]+):((.|\n)*)\n$/m or die;
+		my $target = $1;
+		my $dep = $2;
+		$targets{"build/$dir/$target"} = $dep;
+	}
+
+	for (<$dir/*/>) {
+		s|/$||;
+		&gen_dep($_);
+	}
+}
+
+sub write_makefile
+{
+	open my $makefile, ">", "makefile" or die;
+	print $makefile <<EOF;
+# vim: noet ts=4 sw=4 sts=0 fenc=utf8
+# Licensed under the MIT License. See COPYING for more details.
+# (C) 2014. eXerigumo Clanjor (哆啦比猫/兰威举) <cjxgm\@126.com>
+
+CC = $CC
+LD = $LD
+CCFLAGS = $CCFLAGS
+LDFLAGS = $LDFLAGS
+
+EOF
+	print $makefile "CCFLAGS += `pkg-config --cflags $_`\n" for @libs;
+	print $makefile "LDFLAGS += `pkg-config --libs   $_`\n" for @libs;
+	print $makefile <<EOF;
+
+.PHONY: all clean cleanall rebuild reconf test commit install uninstall
+
+all: init app
+clean: makefile
+	\@echo -e "\e[0;32mcleaning\e[0m"
+	rm -rf build
+	rm -f $dest
+cleanall: clean
+	rm -f makefile
+rebuild: clean all
+reconf:
+	\@echo -e "\e[0;32mreconfiguring\e[0m"
+	./configure
+test: all
+	\@echo -e "\e[0;32mtesting" "\e[1;35m$name\e[0m"
+	$test
+commit: cleanall
+	git add .
+	git diff --cached
+	env LANG=C git commit -a || true
+	./configure
+install: all
+	\@echo -e "\e[0;32minstalling" "\e[1;35m$name\e[0m"
+	install -svm 755 $dest /usr/bin/$name
+EOF
+	print $makefile "\tinstall -vm 644 $_ $installs{$_}/$_\n" for keys %installs;
+	print $makefile <<EOF;
+uninstall:
+	\@echo -e "\e[0;32muninstalling" "\e[1;35m$name\e[0m"
+	rm -f /usr/bin/$name
+EOF
+	print $makefile "\trm -f $installs{$_}/$_\n" for keys %installs;
+	print $makefile <<EOF;
+
+init: makefile build @dirs
+app: makefile $dest
+makefile: configure
+	\@echo -e "\e[0;32mreconfiguring\e[0m"
+	./configure
+build:
+	\@echo -e "\e[0;32mmaking" "\e[1;35mdirectories\e[0m"
+	mkdir -p build
+EOF
+	print $makefile "$_:\n\tmkdir -p $_\n" for @dirs;
+	print $makefile "\n";
+	print $makefile <<EOF for keys %targets;
+$_:$targets{$_} makefile
+	\@echo -e "\e[0;32mcompiling" "\e[1;35m\$@\e[0m"
+	\$(CC) -c -o \$@ \$< \$(CCFLAGS)
+EOF
+	print $makefile <<EOF;
+$dest: @{[keys %targets]}
+	\@echo -e "\e[0;32mlinking" "\e[1;35m\$@\e[0m"
+	\$(LD) -o \$@ \$^ \$(LDFLAGS)
+
+EOF
+	close $makefile
+}
+
+&gen_dep("src");
+&write_makefile;
+
