@@ -42,6 +42,14 @@ namespace lua
 
 		int upvalue_index(int i) { return lua_upvalueindex(i); }
 
+		// XXX XXX XXX XXX    USE WITH CARE    XXX XXX XXX XXX
+		// lua implements its own "throw" system in c, which
+		// is unaware of destructors of local c++ objects,
+		// which may lead to memory leaks!
+		//
+		// so, only call this if it's critical error and,
+		// may the program crash!
+		// XXX XXX XXX XXX    USE WITH CARE    XXX XXX XXX XXX
 		template <class ...Args>
 		void error(Args&& ...args)
 		{
@@ -115,6 +123,11 @@ namespace lua
 			ptr = reinterpret_cast<T*>(lua_touserdata(rs, index));
 		}
 
+		// XXX XXX XXX XXX    USE WITH CARE    XXX XXX XXX XXX
+		// luaL_check* series functions will call luaL_error
+		// when needed. see the comment of error() above
+		// for more details.
+		// XXX XXX XXX XXX    USE WITH CARE    XXX XXX XXX XXX
 		void get(number_type& num, int index)
 		{
 			num = luaL_checknumber(rs, index);
