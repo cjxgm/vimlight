@@ -26,6 +26,8 @@ namespace lua
 		using string_type = std::string;
 		using cfunc_type = lua_CFunction;
 
+		struct failure {};
+
 
 		state(raw_state* s) : rs(s), owned(false) {}
 		state() : rs(luaL_newstate()), owned(true) {}
@@ -46,6 +48,7 @@ namespace lua
 		void error(Args&& ...args)
 		{
 			luaL_error(rs, std::forward<Args>(args)...);
+			throw failure{};
 		}
 
 
