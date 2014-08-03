@@ -5,10 +5,6 @@
 #include <condition_variable>
 #include <utility>
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace vimlight
 {
 	namespace worker
@@ -80,8 +76,6 @@ namespace vimlight
 
 		void run(command_func_type cmd)
 		{
-			cout << ">>> worker::run " << reinterpret_cast<void*>(cmd) << endl;
-
 			// create worker thread
 			std::thread th([cmd] {
 				vimlight::vim vim(cmd);
@@ -93,10 +87,6 @@ namespace vimlight
 				// main loop
 				while (true) {
 					auto src = update::wait();
-					cout << ">>> worker::thread <<" << endl
-						<< src << endl
-						<< ">>" << endl;
-
 					auto result = analyzer.parse(src, group);
 					delta.update(result, vim);
 				}
@@ -109,10 +99,6 @@ namespace vimlight
 
 		void request(source_type src)
 		{
-			cout << ">>> worker::request <<" << endl
-				<< src << endl
-				<< ">>" << endl;
-
 			update::request(std::move(src));
 		}
 	};
