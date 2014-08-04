@@ -1,7 +1,7 @@
 #pragma once
-#include "lua/all.hh"
 #include "highlight/record.hh"
 #include <string>
+#include <vector>
 
 
 
@@ -10,12 +10,12 @@ namespace vimlight
 {
 	struct vim
 	{
-		using command_func_type = lua::cfunction;
 		using hlindex_type = unsigned;
 		using hlrecord_type = highlight::record;
 		using coord_type = hlrecord_type::coord_type;
 		using  name_type = hlrecord_type:: name_type;
 		using command_type = std::string;
+		using commands_type = std::vector<command_type>;
 
 		vim(command_func_type f) : cmd_func(f) {}
 
@@ -30,11 +30,15 @@ namespace vimlight
 			clear(idx);
 		}
 
-	private:
-		lua::state s;
-		command_func_type cmd_func;
+		commands_type get()
+		{
+			return std::move(commands);
+		}
 
-		void eval(const command_type& cmd);
+	private:
+		commands_type commands;
+
+		void push(const command_type& cmd);
 		void region(hlindex_type idx,
 				coord_type y1, coord_type x1,
 				coord_type y2, coord_type x2);
