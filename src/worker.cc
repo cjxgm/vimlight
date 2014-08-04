@@ -72,28 +72,60 @@ namespace vimlight
 		};
 
 
-
-
-		void run(command_func_type cmd)
+		// a communication channel with worker thread
+		// this is used to tell if the worker thread is
+		// finished and is used for result-passing.
+		namespace result
 		{
-			// create worker thread
-			std::thread th([cmd] {
-				vimlight::vim vim(cmd);
-				highlight::group group("hlgroup");
+			using mutex_type = update::mutex_type;
+			using  lock_type = update::lock_type;
+			static update::mutex_type m;
+			static bool is_done = false;
+			static commands_type commands;
+
+			static void update(commands_type cmds)
+			{
+				lock_type lock(m);
+				commands = std::move(cmds);
+				is_done  = true;
+			}
+
+			static bool done()
+			{
+				lock_type lock(m);
+				return is_done;
+			}
+
+			// should be called only when done() == true
+			static commands_type get()
+			{
+				lock_type lock(m);
+				is_done = false;
+				return std::move(commands);
+			}
+		};
+
+
+
+
+		void start(const filename_type& hlgroup)
+		{
+			std::thread th([&hlgroup] {
+				vimlight::vim vim;
+				highlight::group group(hlgroup);
 				vimlight::analyzer analyzer;
 				highlight::delta delta;
 				init::done();
 
-				// main loop
 				while (true) {
 					auto src = update::wait();
 					auto result = analyzer.parse(src, group);
 					delta.update(result, vim);
+					result::update(std::move(vim.get()));
 				}
 			});
 			th.detach();
 
-			// wait for initialization done
 			init::wait();
 		}
 
@@ -101,7 +133,16 @@ namespace vimlight
 		{
 			update::request(std::move(src));
 		}
+
+		bool done()
+		{
+			return result::done();
+		}
+
+		commands_type get()
+		{
+			return std::move(result::get());
+		}
 	};
 };
-
 
