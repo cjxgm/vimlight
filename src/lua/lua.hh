@@ -67,6 +67,11 @@ namespace lua
 			lua_setfield(rs, index, key.c_str());
 		}
 
+		void field(int index, int key)
+		{
+			lua_rawseti(rs, index, key);
+		}
+
 		void push(const string_type& str)
 		{
 			lua_pushlstring(rs, str.c_str(), str.size());
