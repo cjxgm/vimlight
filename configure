@@ -87,6 +87,7 @@ commit: cleanall
 	./configure
 bundle: all
 	\@echo -e "\e[0;32mbundling" "\e[1;35m$name\e[0m"
+	rm -rf bundle/
 	cp -r vim/ bundle/
 	mkdir -p bundle/lib/
 	cp $dest bundle/lib/$name.so
