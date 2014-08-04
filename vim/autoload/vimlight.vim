@@ -19,25 +19,33 @@ lua <<END
 	vl.init(root .. "/etc/hlgroup.vimlight")
 	vl.done = true
 
-	vl.update = function()
-		if vl.done then
-			vl.done = false
-			local src = vim.eval("join(getline(1, '$'), '\n')")
-			vl.request(src)
-		end
-
-		local result = vl.get()
+	vl.apply = function(this)
+		if this.done then return end
+		local result = this.get()
 		if result then
 			for _,cmd in ipairs(result) do
 				vim.command(cmd)
 			end
-			vl.done = true
+			this.done = true
+			return true
+		end
+	end
+
+	vl.update = function(this)
+		if this.done then
+			this.done = false
+			local src = vim.eval("join(getline(1, '$'), '\n')")
+			this.request(src)
 		end
 	end
 END
 
 function vimlight#update()
-	echo "update"
-	lua vimlight.update()
+	lua vimlight:apply()
+	lua vimlight:update()
+endf
+
+function vimlight#apply()
+	lua vimlight:apply()
 endf
 
