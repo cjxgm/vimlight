@@ -15,7 +15,7 @@ namespace vimlight
 		// other functions in worker namespace.
 		//
 		// this function will start a worker thread in the background.
-		void start(filename_type hlgroup);
+		void start(const filename_type& hlgroup);
 
 		// request the worker to highlight the source.
 		void request(source_type src);
