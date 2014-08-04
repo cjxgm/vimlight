@@ -14,9 +14,6 @@ my $name = "vimlight";
 my $dest = "./$name.so";
 my $test = "lua test.lua $name";
 my @libs = qw(lua);
-my %installs = (
-	"nothing" => "/tmp"
-);
 
 
 
@@ -66,13 +63,14 @@ EOF
 	print $makefile "LDFLAGS += `pkg-config --libs   $_`\n" for @libs;
 	print $makefile <<EOF;
 
-.PHONY: all clean cleanall rebuild reconf test commit install uninstall
+.PHONY: all clean cleanall rebuild reconf test bundle commit install uninstall
 
 all: init app
 clean: makefile
 	\@echo -e "\e[0;32mcleaning\e[0m"
 	rm -rf build
 	rm -f $dest
+	rm -rf bundle
 cleanall: clean
 	rm -f makefile
 rebuild: clean all
@@ -87,18 +85,19 @@ commit: cleanall
 	git diff --cached
 	env LANG=C git commit -a || true
 	./configure
-install: all
+bundle: all
+	\@echo -e "\e[0;32mbundling" "\e[1;35m$name\e[0m"
+	cp -r vim/ bundle/
+	mkdir -p bundle/lib/
+	cp $dest bundle/lib/$name.so
+	cp README.md bundle/
+	cp COPYING* bundle/
+install: uninstall bundle
 	\@echo -e "\e[0;32minstalling" "\e[1;35m$name\e[0m"
-	install -svm 755 $dest /usr/bin/$name
-EOF
-	print $makefile "\tinstall -vm 644 $_ $installs{$_}/$_\n" for keys %installs;
-	print $makefile <<EOF;
+	cp -r bundle/ ~/.vim/bundle/vimlight/
 uninstall:
 	\@echo -e "\e[0;32muninstalling" "\e[1;35m$name\e[0m"
-	rm -f /usr/bin/$name
-EOF
-	print $makefile "\trm -f $installs{$_}/$_\n" for keys %installs;
-	print $makefile <<EOF;
+	rm -rf ~/.vim/bundle/vimlight/
 
 init: makefile build @dirs
 app: makefile $dest
