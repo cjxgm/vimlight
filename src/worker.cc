@@ -112,8 +112,8 @@ namespace vimlight
 		{
 			std::thread th([&hlgroup] {
 				vimlight::vim vim;
-				highlight::group group(hlgroup);
 				vimlight::analyzer analyzer;
+				highlight::group group(hlgroup);
 				highlight::delta delta;
 				init::done();
 
