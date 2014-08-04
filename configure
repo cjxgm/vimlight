@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 # vim: noet ts=4 sw=4 sts=0 fenc=utf8
-# Licensed under the MIT License. See COPYING for more details.
+# Licensed under the MIT License. See LICENSE for details.
 # (C) 2014. eXerigumo Clanjor (哆啦比猫/兰威举) <cjxgm@126.com>
 
 
@@ -50,7 +50,7 @@ sub write_makefile
 	open my $makefile, ">", "makefile" or die;
 	print $makefile <<EOF;
 # vim: noet ts=4 sw=4 sts=0 fenc=utf8
-# Licensed under the MIT License. See COPYING for more details.
+# Licensed under the MIT License. See LICENSE for details.
 # (C) 2014. eXerigumo Clanjor (哆啦比猫/兰威举) <cjxgm\@126.com>
 
 CC = $CC
@@ -91,7 +91,7 @@ bundle: all
 	mkdir -p bundle/lib/
 	cp $dest bundle/lib/$name.so
 	cp README.md bundle/
-	cp COPYING* bundle/
+	cp LICENSE* bundle/
 install: uninstall bundle
 	\@echo -e "\e[0;32minstalling" "\e[1;35m$name\e[0m"
 	cp -r bundle/ ~/.vim/bundle/vimlight/
