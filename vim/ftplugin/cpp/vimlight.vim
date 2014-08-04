@@ -10,11 +10,11 @@ if exists("b:did_vimlight")
 endif
 let b:did_vimlight = 1
 
-au BufWinEnter	* call vimlight#update()
-au TextChanged	* call vimlight#update()
-au TextChangedI	* call vimlight#update()
-au CursorHold	* call vimlight#apply()
-au CursorHoldI	* call vimlight#apply()
-au CursorMoved	* call vimlight#apply()
-au CursorMovedI	* call vimlight#apply()
+au BufWinEnter	* call vimlight#modify()
+au TextChanged	* call vimlight#modify()
+au TextChangedI	* call vimlight#modify()
+au CursorHold	* call vimlight#update()
+au CursorHoldI	* call vimlight#update()
+au CursorMoved	* call vimlight#update()
+au CursorMovedI	* call vimlight#update()
 

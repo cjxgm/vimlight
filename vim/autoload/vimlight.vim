@@ -18,6 +18,7 @@ lua <<END
 
 	vl.init(root .. "/etc/hlgroup.vimlight")
 	vl.done = true
+	vl.modified = true
 
 	vl.apply = function(this)
 		if this.done then return end
@@ -34,18 +35,28 @@ lua <<END
 	vl.update = function(this)
 		if this.done then
 			this.done = false
+			this.modified = false
 			local src = vim.eval("join(getline(1, '$'), '\n')")
 			this.request(src)
 		end
 	end
+
+	vl.modify = function(this)
+		this.modified = true
+	end
 END
 
 function vimlight#update()
-	lua vimlight:apply()
-	lua vimlight:update()
+lua <<END
+	vimlight:apply()
+	if vimlight.modified then
+		vimlight:update()
+	end
+END
 endf
 
-function vimlight#apply()
-	lua vimlight:apply()
+function vimlight#modify()
+	lua vimlight:modify()
+	call vimlight#update()
 endf
 
