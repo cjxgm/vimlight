@@ -38,13 +38,13 @@ namespace clang
 			guard(const self_type&) = delete;
 			self_type& operator=(const self_type&) = delete;
 
-			guard(self_type&& other) : super_type(other.value), owned(true)
+			guard(self_type&& other) : super_type(other.get()), owned(true)
 			{
 				other.owned = false;
 			}
 			self_type& operator=(self_type&& other)
 			{
-				set(other.value);
+				set(other.get());
 				owned = true;
 				other.owned = false;
 				return *this;

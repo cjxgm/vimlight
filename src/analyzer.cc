@@ -10,6 +10,17 @@ namespace vimlight
 		list_type list;
 		tu.parse(src);
 
+		auto diags = tu.diagnostics();
+		for (auto& diag: diags)
+			try {
+				auto pos = diag.location().position();
+				list.push_back({
+						pos.y, pos.x,
+						pos.y, pos.x+1,
+						"error"});
+			}
+			catch (std::out_of_range) {}
+
 		tu.cursor().each_child([&](const clang::cursor& cursor) {
 			auto range = cursor.range();
 			auto head = range.head();

@@ -152,6 +152,15 @@ namespace clang
 			FORWARD_FUNC(default_reparse, defaultReparseOptions);
 		};
 
+		namespace diagnostic
+		{
+			FORWARD_TYPE(Diagnostic);
+			FORWARD_FUNC(dispose, disposeDiagnostic);
+			FORWARD_FUNC(get, getDiagnostic);
+			FORWARD_FUNC(get_count, getNumDiagnostics);
+			FORWARD_FUNC(get_location, getDiagnosticLocation);
+		};
+
 
 
 

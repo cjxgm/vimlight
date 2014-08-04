@@ -4,6 +4,9 @@
 #include "unsaved_file.hh"
 #include "index.hh"
 #include "cursor.hh"
+#include "diagnostic.hh"
+#include <vector>
+#include <utility>
 
 namespace clang
 {
@@ -13,6 +16,7 @@ namespace clang
 		using super_type = internal::guard<c::translation_unit::type>;
 		using source_type = unsaved_file::source_type;
 		using index_type = clang::index;
+		using diagnostics_type = std::vector<clang::diagnostic>;
 
 		translation_unit(const index_type& index, const source_type& src="")
 		{
@@ -31,7 +35,17 @@ namespace clang
 			c::translation_unit::reparse(get(), 1, f, opt);
 		}
 
-		cursor cursor() { return c::translation_unit::get_cursor(get()); }
+		cursor cursor() const { return c::translation_unit::get_cursor(get()); }
+
+		diagnostics_type diagnostics() const
+		{
+			diagnostics_type diags;
+			auto size = c::diagnostic::get_count(get());
+			diags.reserve(size);
+			for (int i=0; i<size; i++)
+				diags.emplace_back(c::diagnostic::get(get(), i));
+			return std::move(diags);
+		}
 	};
 };
 
