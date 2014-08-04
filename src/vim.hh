@@ -17,8 +17,6 @@ namespace vimlight
 		using command_type = std::string;
 		using commands_type = std::vector<command_type>;
 
-		vim(command_func_type f) : cmd_func(f) {}
-
 		void add(hlindex_type idx, hlrecord_type rec)
 		{
 			region(idx, rec.y1, rec.x1, rec.y2, rec.x2);
