@@ -2,20 +2,20 @@
 #include "worker.hh"
 #include <utility>
 
-static lua::library lib;
-static bool inited = false;
-
 namespace vimlight
 {
 	namespace library
 	{
+		static lua::library lib;
+		static bool inited = false;
+
 		int open(lua::state& s)
 		{
 			lib["init"] = [](lua::state& s) {
 				if (!inited) {
-					worker::command_func_type cmd;
-					s.get(cmd, 1);
-					worker::run(cmd);
+					worker::filename_type hlgroup;
+					s.get(hlgroup, 1);
+					worker::start(hlgroup);
 					inited = true;
 				}
 				else s.error("multiple initialization");
