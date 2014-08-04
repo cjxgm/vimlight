@@ -30,6 +30,18 @@ namespace vimlight
 				return 0;
 			};
 
+			lib["get"] = [](lua::state& s) {
+				if (!inited) s.error("not initialized");
+				if (!worker::done()) return 0;
+				auto cmds = worker::get();
+				s.table(cmds.size(), 0);
+				for (int i=0; i<cmds.size(); i++) {
+					s.push(cmds[i]);
+					s.field(-2, i+1);
+				}
+				return 1;
+			};
+
 			s.push(lib);
 			return 1;
 		}
