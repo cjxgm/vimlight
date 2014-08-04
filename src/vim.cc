@@ -16,9 +16,9 @@ namespace vimlight
 			coord_type y2, coord_type x2)
 	{
 		std::stringstream ss;
-		ss	<< "syn region vimlight" << idx
-			<< " start=+\\%" << y1 << "l\\%" << x1 << "c+"
-			<<   " end=+\\%" << y2 << "l\\%" << x2 << "c+";
+		ss	<< "syn match vimlight" << idx
+			<< " +\\%" << y1 << "l\\%" << x1 << "c"
+			<< ".*\\%" << y2 << "l\\%" << x2 << "c+";
 		push(ss.str());
 	}
 
