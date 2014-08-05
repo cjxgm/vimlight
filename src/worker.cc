@@ -48,11 +48,11 @@ namespace vimlight
 		// initialized and ready to accept update requests.
 		namespace init
 		{
-			using mutex_type = update::mutex_type;
-			using condv_type = update::condv_type;
-			using  lock_type = update::lock_type;
-			static update::mutex_type m;
-			static update::condv_type cv;
+			using mutex_type = std::mutex;
+			using condv_type = std::condition_variable;
+			using  lock_type = std::unique_lock<mutex_type>;
+			static mutex_type m;
+			static condv_type cv;
 			static bool is_done = false;
 
 			static void wait()
@@ -77,9 +77,9 @@ namespace vimlight
 		// finished and is used for result-passing.
 		namespace result
 		{
-			using mutex_type = update::mutex_type;
-			using  lock_type = update::lock_type;
-			static update::mutex_type m;
+			using mutex_type = std::mutex;
+			using  lock_type = std::lock_guard<mutex_type>;
+			static mutex_type m;
 			static bool is_done = false;
 			static commands_type commands;
 
