@@ -1,3 +1,5 @@
+// this is a lua library.
+// this module is a bridge to the c++ implementation of the library.
 #include "library.hh"
 
 extern "C"
