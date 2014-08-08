@@ -1,4 +1,7 @@
 #pragma once
+// management and communication with/to/from the worker thread
+// the worker thread parses the requested source code and
+// produces vim highlighting commands.
 #include "analyzer.hh"
 #include "vim.hh"
 #include "highlight/type.hh"
