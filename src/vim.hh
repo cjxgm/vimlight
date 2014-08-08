@@ -1,10 +1,8 @@
 #pragma once
+// this module is for generating vim commands for highlighting.
 #include "highlight/record.hh"
 #include <string>
 #include <vector>
-
-
-
 
 namespace vimlight
 {
@@ -17,17 +15,22 @@ namespace vimlight
 		using command_type = std::string;
 		using commands_type = std::vector<command_type>;
 
+		// generate a command to add a highlighting region
+		// and add it to the commands buffer
 		void add(hlindex_type idx, hlrecord_type rec)
 		{
 			region(idx, rec.y1, rec.x1, rec.y2, rec.x2);
 			link(idx, rec.name);
 		}
 
+		// generate a command to remove a highlighting region
+		// and add it to the commands buffer
 		void rm(hlindex_type idx)
 		{
 			clear(idx);
 		}
 
+		// get the highlighting commands and clear the commands buffer
 		commands_type get()
 		{
 			return std::move(commands);
