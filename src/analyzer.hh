@@ -1,4 +1,5 @@
 #pragma once
+// analyzer analyzes source code and produce a highlight list.
 #include "clang/all.hh"
 #include "highlight/all.hh"
 
