@@ -18,12 +18,15 @@ namespace vimlight
 		void start(const filename_type& hlgroup);
 
 		// request the worker to highlight the source.
+		// you can call request even if !done()
 		void request(source_type src);
 
 		// check if the last request is done
+		// when it's done, you can call get() to get the result.
 		bool done();
 
-		// get the highlight result
+		// get the highlight result if done()
+		// returns vim commands
 		commands_type get();
 	};
 };
