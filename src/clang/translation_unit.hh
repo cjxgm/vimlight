@@ -21,7 +21,7 @@ namespace clang
 		translation_unit(const index_type& index, const source_type& src="")
 		{
 			clang::unsaved_file f(src);
-			const char* argv[] = { "-std=gnu++11" };
+			const char* argv[] = { "-std=gnu++1y" };
 			set(c::translation_unit::create_from_source_file(
 					index, f.name(), 1, argv, 1, f));
 		}
