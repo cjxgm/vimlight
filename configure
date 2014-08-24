@@ -95,6 +95,7 @@ bundle: all
 	cp LICENSE* bundle/
 install: uninstall bundle
 	\@echo -e "\e[0;32minstalling" "\e[1;35m$name\e[0m"
+	mkdir -p ~/.vim/bundle/
 	cp -r bundle/ ~/.vim/bundle/vimlight/
 uninstall:
 	\@echo -e "\e[0;32muninstalling" "\e[1;35m$name\e[0m"
