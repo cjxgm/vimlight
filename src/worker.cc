@@ -51,6 +51,7 @@ namespace vimlight
 
 				chn_worker.listen<event_name>([&](event_name ev) {
 					log << "(worker) name: " << ev.name << endl;
+					analyzer.name(ev.name);
 				});
 
 				while (true) chn_worker.wait();
