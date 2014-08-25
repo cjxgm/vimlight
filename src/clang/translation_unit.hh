@@ -5,6 +5,7 @@
 #include "index.hh"
 #include "cursor.hh"
 #include "diagnostic.hh"
+#include "../log.hh"
 #include <vector>
 #include <utility>
 
@@ -30,8 +31,9 @@ namespace clang
 		{
 			clang::unsaved_file uf(f, "");
 			const char* argv[] = { "-std=gnu++1y" };
-			set(c::translation_unit::create_from_source_file(
-					index, f.c_str(), 1, argv, 1, uf));
+			set(c::translation_unit::parse(
+					index, f.c_str(), argv, 1, uf, 1,
+					c::translation_unit::flag::none));
 			file = f;
 		}
 
@@ -48,6 +50,9 @@ namespace clang
 		{
 			diagnostics_type diags;
 			auto size = c::diagnostic::get_count(get());
+			using vimlight::log;
+			using vimlight::endl;
+			log << "clang::tu::diagnostics(): size=" << size << endl;
 			diags.reserve(size);
 			for (int i=0; i<size; i++)
 				diags.emplace_back(c::diagnostic::get(get(), i));
