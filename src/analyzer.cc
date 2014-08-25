@@ -14,16 +14,14 @@ namespace vimlight
 		log << "analyzer::parse():" << endl;
 
 		auto diags = tu.diagnostics();
-		for (auto& diag: diags)
-			try {
-				auto pos = diag.location().position();
-				list.push_back({
-						pos.y, pos.x,
-						pos.y, pos.x+1,
-						"error"});
-				log << "\t[error]  " << pos.y << ", " << pos.x << endl;
-			}
-			catch (std::out_of_range) {}
+		for (auto& diag: diags) {
+			auto pos = diag.location().position();
+			list.push_back({
+					pos.y, pos.x,
+					pos.y, pos.x+1,
+					"error" });
+			log << "\t[error]  " << pos.y << ", " << pos.x << endl;
+		}
 
 		tu.cursor().each_child([&](const clang::cursor& cursor) {
 			auto range = cursor.range();
