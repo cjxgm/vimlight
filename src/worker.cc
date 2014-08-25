@@ -1,147 +1,97 @@
 #include "worker.hh"
+#include "channel.hh"
 #include "highlight/all.hh"
+#include "log.hh"
 #include <thread>
-#include <mutex>
-#include <condition_variable>
 #include <utility>
 
 namespace vimlight
 {
 	namespace worker
 	{
-		// a communication channel with worker thread
-		// this is used to tell the worker thread to update
-		// the highlight. this will pass the last updated
-		// source code to the worker thread.
-		namespace update
+		static channel chn_worker;
+		static channel chn_main;
+
+		struct event_done : public channel::event {};
+		struct event_request : public channel::event
 		{
-			using mutex_type = std::mutex;
-			using condv_type = std::condition_variable;
-			using  lock_type = std::unique_lock<mutex_type>;
-			static mutex_type m;
-			static condv_type cv;
-			static bool requested = false;
-			static source_type src;
-
-			static source_type wait()
-			{
-				lock_type lock(m);
-				cv.wait(lock, [] { return requested; });
-				requested = false;
-				return std::move(src);
-			}
-
-			static void request(source_type s)
-			{
-				{
-					lock_type lock(m);
-					src = std::move(s);
-					requested = true;
-				}
-				cv.notify_one();
-			}
+			source_type src;
+			event_request(source_type src) : src{std::move(src)} {}
 		};
-
-
-		// a communication channel with worker thread
-		// this is used to tell if the worker thread is
-		// initialized and ready to accept update requests.
-		namespace init
+		struct event_result : public channel::event
 		{
-			using mutex_type = std::mutex;
-			using condv_type = std::condition_variable;
-			using  lock_type = std::unique_lock<mutex_type>;
-			static mutex_type m;
-			static condv_type cv;
-			static bool is_done = false;
-
-			static void wait()
-			{
-				lock_type lock(m);
-				cv.wait(lock, [] { return is_done; });
-			}
-
-			static void done()
-			{
-				{
-					lock_type lock(m);
-					is_done = true;
-				}
-				cv.notify_one();
-			}
+			commands_type cmds;
+			event_result(commands_type cmds) : cmds{std::move(cmds)} {}
 		};
-
-
-		// a communication channel with worker thread
-		// this is used to tell if the worker thread is
-		// finished and is used for result-passing.
-		namespace result
+		struct event_name : public channel::event
 		{
-			using mutex_type = std::mutex;
-			using  lock_type = std::lock_guard<mutex_type>;
-			static mutex_type m;
-			static bool is_done = false;
-			static commands_type commands;
-
-			static void update(commands_type cmds)
-			{
-				lock_type lock(m);
-				commands = std::move(cmds);
-				is_done  = true;
-			}
-
-			static bool done()
-			{
-				lock_type lock(m);
-				return is_done;
-			}
-
-			// should be called only when done() == true
-			static commands_type get()
-			{
-				lock_type lock(m);
-				is_done = false;
-				return std::move(commands);
-			}
+			filename_type name;
+			event_name(filename_type name) : name{std::move(name)} {}
 		};
-
-
 
 
 		void start(const filename_type& hlgroup)
 		{
+			auto rm_done = chn_main.listen<event_done>([] {});
+
 			std::thread th([&hlgroup] {
 				vimlight::vim vim;
 				vimlight::analyzer analyzer;
 				highlight::group group(hlgroup);
 				highlight::delta delta;
-				init::done();
+				chn_main.post(event_done{});
 
-				while (true) {
-					auto src = update::wait();
-					auto result = analyzer.parse(src, group);
+				chn_worker.listen<event_request>([&](event_request ev) {
+					log << "(worker) parse request" << endl;
+					auto result = analyzer.parse(ev.src, group);
 					delta.update(result, vim);
-					result::update(std::move(vim.get()));
-				}
+					chn_main.post(event_done{});
+					chn_main.post(event_result{std::move(vim.get())});
+				});
+
+				chn_worker.listen<event_name>([&](event_name ev) {
+					log << "(worker) name: " << ev.name << endl;
+				});
+
+				while (true) chn_worker.wait();
 			});
 			th.detach();
 
-			init::wait();
+			chn_main.wait();
+			rm_done();
 		}
 
 		void request(source_type src)
 		{
-			update::request(std::move(src));
+			chn_worker.post(event_request{std::move(src)});
 		}
 
 		bool done()
 		{
-			return result::done();
+			bool is_done = false;
+			auto rm_done = chn_main.listen<event_done>([&] {
+				is_done = true;
+			});
+			chn_main.poll();
+			rm_done();
+			return is_done;
 		}
 
 		commands_type get()
 		{
-			return std::move(result::get());
+			commands_type cmds;
+			auto rm_result = chn_main.listen<event_result>(
+					[&](event_result ev) {
+						cmds = std::move(ev.cmds);
+					});
+			chn_main.wait();
+			rm_result();
+			return std::move(cmds);
+		}
+
+		void name(filename_type f)
+		{
+			chn_worker.post(event_name{std::move(f)});
 		}
 	};
 };
