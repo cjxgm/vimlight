@@ -1,4 +1,5 @@
 #include "analyzer.hh"
+#include "log.hh"
 #include <utility>
 
 namespace vimlight
@@ -30,15 +31,22 @@ namespace vimlight
 			auto head_pos =       head  .position();
 			auto tail_pos = range.tail().position();
 			auto kind = cursor.kind().name();
+			log << "analyzer::parse():" << endl
+				<< "\t[" << kind << "]" << endl
+				<< "\t\"" << cursor.name() << "\"" << endl
+				<< "\t" << head_pos.y << ", " << head_pos.x
+				<< " -> " << tail_pos.y << ", " << tail_pos.x << "\t";
 
 			try {
 				list.push_back({
 						head_pos.y, head_pos.x,
 						tail_pos.y, tail_pos.x,
 						group.at(kind)});
+				log << "yes" << endl;
 				return true;
 			}
 			catch (std::out_of_range) {}
+			log << "no" << endl;
 
 			return true;
 		});
