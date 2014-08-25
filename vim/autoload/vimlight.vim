@@ -22,18 +22,14 @@ lua <<END
 
 	vl.apply = function(this)
 		if this.done then return end
-		local result;
-		local new_result;
-		repeat
-			result = new_result
-			new_result = this.get()
-		until new_result == nil
-		if result then
+		local result
+		while true do
+			result = this.get()
+			if result == nil then break end
 			for _,cmd in ipairs(result) do
 				vim.command(cmd)
 			end
 			this.done = true
-			return true
 		end
 	end
 
