@@ -44,6 +44,12 @@ lua <<END
 	vl.modify = function(this)
 		this.modified = true
 	end
+
+	vl.rename = function(this)
+		local file = vim.eval("expand('%')")
+		if file == "" then file = "source.cc" end
+		this.name(file)
+	end
 END
 
 function vimlight#update()
@@ -58,5 +64,10 @@ endf
 function vimlight#modify()
 	lua vimlight:modify()
 	call vimlight#update()
+endf
+
+function vimlight#rename()
+	lua vimlight:rename()
+	call vimlight#modify()
 endf
 
