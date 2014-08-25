@@ -22,13 +22,14 @@ lua <<END
 
 	vl.apply = function(this)
 		if this.done then return end
-		local result = this.get()
-		if result then
+		local result
+		while true do
+			result = this.get()
+			if result == nil then break end
 			for _,cmd in ipairs(result) do
 				vim.command(cmd)
 			end
 			this.done = true
-			return true
 		end
 	end
 
@@ -44,6 +45,12 @@ lua <<END
 	vl.modify = function(this)
 		this.modified = true
 	end
+
+	vl.rename = function(this)
+		local file = vim.eval("expand('%')")
+		if file == "" then file = "source.cc" end
+		this.name(file)
+	end
 END
 
 function vimlight#update()
@@ -58,5 +65,10 @@ endf
 function vimlight#modify()
 	lua vimlight:modify()
 	call vimlight#update()
+endf
+
+function vimlight#rename()
+	lua vimlight:rename()
+	call vimlight#modify()
 endf
 
