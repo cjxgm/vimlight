@@ -31,6 +31,9 @@ namespace vimlight
 		// get the highlight result if done()
 		// returns vim commands
 		commands_type get();
+
+		// rename the current editing source file
+		void name(filename_type f);
 	};
 };
 
