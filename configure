@@ -93,7 +93,7 @@ bundle: all
 	cp $dest bundle/lib/$name.so
 	cp README.md bundle/
 	cp LICENSE* bundle/
-install: uninstall bundle
+install: bundle uninstall
 	\@echo -e "\e[0;32minstalling" "\e[1;35m$name\e[0m"
 	mkdir -p ~/.vim/bundle/
 	cp -r bundle/ ~/.vim/bundle/vimlight/
