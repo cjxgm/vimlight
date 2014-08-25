@@ -89,10 +89,16 @@ namespace clang
 		namespace translation_unit
 		{
 			FORWARD_TYPE(TranslationUnit);
-			FORWARD_FUNC(create_from_source_file, createTranslationUnitFromSourceFile);
+			FORWARD_FUNC(parse, parseTranslationUnit);
 			FORWARD_FUNC(dispose, disposeTranslationUnit);
-			FORWARD_FUNC(get_cursor, getTranslationUnitCursor);
 			FORWARD_FUNC(reparse, reparseTranslationUnit);
+			FORWARD_FUNC(get_cursor, getTranslationUnitCursor);
+			namespace flag
+			{
+				FORWARD_TYPE(TranslationUnit_Flags);
+				constexpr auto none = CXTranslationUnit_None;
+				constexpr auto incomplete = CXTranslationUnit_Incomplete;
+			};
 		};
 
 		namespace cursor
@@ -159,6 +165,7 @@ namespace clang
 			FORWARD_FUNC(get, getDiagnostic);
 			FORWARD_FUNC(get_count, getNumDiagnostics);
 			FORWARD_FUNC(get_location, getDiagnosticLocation);
+			FORWARD_FUNC(get_spelling, getDiagnosticSpelling);
 		};
 
 
