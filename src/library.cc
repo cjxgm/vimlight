@@ -42,6 +42,14 @@ namespace vimlight
 				return 1;
 			};
 
+			lib["name"] = [](lua::state& s) {
+				if (!inited) s.error("not initialized");
+				worker::filename_type f;
+				s.get(f, 1);
+				worker::name(std::move(f));
+				return 0;
+			};
+
 			s.push(lib);
 			return 1;
 		}
