@@ -11,6 +11,8 @@ namespace vimlight
 		list_type list;
 		tu.parse(src);
 
+		log << "analyzer::parse():" << endl;
+
 		auto diags = tu.diagnostics();
 		for (auto& diag: diags)
 			try {
@@ -19,6 +21,7 @@ namespace vimlight
 						pos.y, pos.x,
 						pos.y, pos.x+1,
 						"error"});
+				log << "\t[error]  " << pos.y << ", " << pos.x << endl;
 			}
 			catch (std::out_of_range) {}
 
@@ -31,10 +34,9 @@ namespace vimlight
 			auto head_pos =       head  .position();
 			auto tail_pos = range.tail().position();
 			auto kind = cursor.kind().name();
-			log << "analyzer::parse():" << endl
-				<< "\t[" << kind << "]" << endl
-				<< "\t\"" << cursor.name() << "\"" << endl
-				<< "\t" << head_pos.y << ", " << head_pos.x
+			log << "\t[" << kind << "]" << endl
+				<< "\t\t\"" << cursor.name() << "\"" << endl
+				<< "\t\t" << head_pos.y << ", " << head_pos.x
 				<< " -> " << tail_pos.y << ", " << tail_pos.x << "\t";
 
 			try {
