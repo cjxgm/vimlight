@@ -30,13 +30,14 @@ namespace clang
 		void name(const filename_type& f)
 		{
 			clang::unsaved_file uf(f, "");
-			const char* argv[] = { "-std=gnu++1y" };
+			const char* argv[] = { "-std=gnu++1y", "-Wall", "-Wextra" };
+			constexpr auto argc = sizeof(argv)/sizeof(*argv);
 
 			if (owned) c::translation_unit::dispose(get());
 			else owned = true;
 
 			set(c::translation_unit::parse(
-					index, f.c_str(), argv, 1, uf, 1,
+					index, f.c_str(), argv, argc, uf, 1,
 					c::translation_unit::flag::none));
 
 			file = f;
