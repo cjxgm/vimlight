@@ -19,7 +19,12 @@ namespace clang
 		~diagnostic() override { if (owned) c::diagnostic::dispose(get()); }
 
 		location location() { return c::diagnostic::get_location(get()); }
-		text_type text() { return clang::string{c::diagnostic::get_spelling(get())}; }
+		text_type text()
+		{
+			return clang::string{
+				c::diagnostic::format(get(),
+						c::options::default_diagnostic_display())};
+		}
 	};
 };
 
