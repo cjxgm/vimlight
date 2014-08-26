@@ -12,10 +12,10 @@ namespace vimlight
 		tu.parse(src);
 
 		auto diags = tu.diagnostics();
-		log << "analyzer::parse():" << endl;
+		log << "analyzer::parse():\n";
 		for (auto& diag: diags) {
-			log << "\t[error]" << endl
-				<< "\t\t" << diag.text() << endl;
+			log << "\t[error]\n"
+				<< "\t\t" << diag.text() << '\n';
 
 			auto loc = diag.location();
 			if (!loc.is_from_main()) continue;
@@ -26,7 +26,7 @@ namespace vimlight
 					pos.y, pos.x+1,
 					"error" });
 
-			log << "\t\t" << pos.y << ", " << pos.x << endl;
+			log << "\t\t" << pos.y << ", " << pos.x << '\n';
 		}
 
 		tu.cursor().each_child([&](const clang::cursor& cursor) {
@@ -38,21 +38,21 @@ namespace vimlight
 			auto head_pos =       head  .position();
 			auto tail_pos = range.tail().position();
 			auto kind = cursor.kind().name();
-			log << "\t[" << kind << "]" << endl
-				<< "\t\t\"" << cursor.name() << "\"" << endl
+			log << "\t[" << kind << "]\n"
+				<< "\t\t\"" << cursor.name() << "\"\n"
 				<< "\t\t" << head_pos.y << ", " << head_pos.x
-				<< " -> " << tail_pos.y << ", " << tail_pos.x << endl;
+				<< " -> " << tail_pos.y << ", " << tail_pos.x << '\n';
 
 			try {
 				if (kind == "InitListExpr") {
 					kind = group.at("init_list_brace");
-					log << "\t[init_list_brace]" << endl
+					log << "\t[init_list_brace]\n"
 						<< "\t\t" << head_pos.y << ", " << head_pos.x
 						<< " -> " << head_pos.y << ", " << head_pos.x+1
-						<< endl
+						<< '\n'
 						<< "\t\t" << tail_pos.y << ", " << tail_pos.x-1
 						<< " -> " << tail_pos.y << ", " << tail_pos.x
-						<< endl;
+						<< '\n';
 					list.push_back({
 							head_pos.y, head_pos.x,
 							head_pos.y, head_pos.x+1,
@@ -61,7 +61,7 @@ namespace vimlight
 							tail_pos.y, tail_pos.x-1,
 							tail_pos.y, tail_pos.x,
 							kind });
-					log << "\t\t" << kind << endl;
+					log << "\t\t" << kind << '\n';
 				}
 
 				else {
@@ -69,7 +69,7 @@ namespace vimlight
 							head_pos.y, head_pos.x,
 							tail_pos.y, tail_pos.x,
 							group.at(kind) });
-					log << "\t\t" << group.at(kind) << endl;
+					log << "\t\t" << group.at(kind) << '\n';
 				}
 				return true;
 			}
