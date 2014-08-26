@@ -2,7 +2,5 @@ TypeRef			Type
 NamespaceRef	Special
 TemplateRef		MoreMsg
 FunctionRef		MoreMsg
-MemberRefExpr	Underlined
-DeclRefExpr		Normal
 error			Error
 init_list_brace	Define
