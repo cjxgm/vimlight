@@ -156,6 +156,7 @@ namespace clang
 		namespace options
 		{
 			FORWARD_FUNC(default_reparse, defaultReparseOptions);
+			FORWARD_FUNC(default_diagnostic_display, defaultDiagnosticDisplayOptions);
 		};
 
 		namespace diagnostic
@@ -165,7 +166,7 @@ namespace clang
 			FORWARD_FUNC(get, getDiagnostic);
 			FORWARD_FUNC(get_count, getNumDiagnostics);
 			FORWARD_FUNC(get_location, getDiagnosticLocation);
-			FORWARD_FUNC(get_spelling, getDiagnosticSpelling);
+			FORWARD_FUNC(format, formatDiagnostic);
 		};
 
 
