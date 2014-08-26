@@ -14,13 +14,19 @@ namespace vimlight
 		auto diags = tu.diagnostics();
 		log << "analyzer::parse():" << endl;
 		for (auto& diag: diags) {
-			auto pos = diag.location().position();
+			log << "\t[error]" << endl
+				<< "\t\t" << diag.text() << endl;
+
+			auto loc = diag.location();
+			if (!loc.is_from_main()) continue;
+
+			auto pos =  loc.position();
 			list.push_back({
 					pos.y, pos.x,
 					pos.y, pos.x+1,
 					"error" });
-			log << "\t[error]  " << pos.y << ", " << pos.x << endl
-				<< "\t\t" << diag.text() << endl;
+
+			log << "\t\t" << pos.y << ", " << pos.x << endl;
 		}
 
 		tu.cursor().each_child([&](const clang::cursor& cursor) {
