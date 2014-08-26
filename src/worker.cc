@@ -42,7 +42,7 @@ namespace vimlight
 				chn_main.post(event_done{});
 
 				chn_worker.listen<event_request>([&](event_request ev) {
-					log << "(worker) parse request" << endl;
+					log << "(worker) parse request\n";
 					auto result = analyzer.parse(ev.src, group);
 					delta.update(result, vim);
 					chn_main.post(event_done{});
@@ -50,7 +50,7 @@ namespace vimlight
 				});
 
 				chn_worker.listen<event_name>([&](event_name ev) {
-					log << "(worker) name: " << ev.name << endl;
+					log << "(worker) name: " << ev.name << '\n';
 					analyzer.name(ev.name);
 				});
 

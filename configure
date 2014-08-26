@@ -53,9 +53,12 @@ sub write_makefile
 # License: The MIT License with modification. See LICENSE for details.
 # (C) 2014. eXerigumo Clanjor (哆啦比猫/兰威举) <cjxgm\@126.com>
 
+LOG = no
+LOG_SYSTEM = \$(LOG)_log
+
 CC = $CC
 LD = $LD
-CCFLAGS = $CCFLAGS
+CCFLAGS = $CCFLAGS -DLOG_SYSTEM=\$(LOG_SYSTEM)
 LDFLAGS = $LDFLAGS
 
 EOF

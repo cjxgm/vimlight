@@ -2,6 +2,6 @@
 
 namespace vimlight
 {
-	log_file log{"/tmp/vimlight.log"};
+	log_system::log log;
 };
 
