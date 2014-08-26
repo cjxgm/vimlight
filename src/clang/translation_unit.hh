@@ -5,7 +5,6 @@
 #include "index.hh"
 #include "cursor.hh"
 #include "diagnostic.hh"
-#include "../log.hh"
 #include <vector>
 #include <utility>
 
@@ -50,9 +49,6 @@ namespace clang
 		{
 			diagnostics_type diags;
 			auto size = c::diagnostic::get_count(get());
-			using vimlight::log;
-			using vimlight::endl;
-			log << "clang::tu::diagnostics(): size=" << size << endl;
 			diags.reserve(size);
 			for (int i=0; i<size; i++)
 				diags.emplace_back(c::diagnostic::get(get(), i));
