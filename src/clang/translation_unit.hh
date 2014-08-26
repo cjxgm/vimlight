@@ -21,6 +21,7 @@ namespace clang
 
 		translation_unit(index_type& index) : index(index)
 		{
+			owned = false;
 			name("source.cc");
 		}
 
@@ -30,9 +31,14 @@ namespace clang
 		{
 			clang::unsaved_file uf(f, "");
 			const char* argv[] = { "-std=gnu++1y" };
+
+			if (owned) c::translation_unit::dispose(get());
+			else owned = true;
+
 			set(c::translation_unit::parse(
 					index, f.c_str(), argv, 1, uf, 1,
 					c::translation_unit::flag::none));
+
 			file = f;
 		}
 
