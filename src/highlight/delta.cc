@@ -7,9 +7,8 @@ namespace vimlight
 		void delta::update(list_type list, vim_type& vim)
 		{
 			auto size = std::min(old.size(), list.size());
-			using size_type = decltype(size);
 
-			for (size_type i=0; i<size; i++)
+			for (decltype(size) i=0; i<size; i++)
 				if (old[i] != list[i]) {
 					vim.rm (i);
 					vim.add(i, list[i]);
