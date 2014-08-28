@@ -8,11 +8,11 @@
 
 my $CC = "clang++";
 my $LD = "clang++";
-my $CCFLAGS = "-std=gnu++11 -march=native -O3 -Wall -fPIC";
+my $CCFLAGS = "-std=gnu++11 -march=native -O3 -Wall -Wextra -fPIC";
 my $LDFLAGS = "-pthread -lclang -shared";
 my $name = "vimlight";
 my $dest = "./$name.so";
-my $test = "lua test.lua $name";
+my $test = "exit 1";
 my @libs = qw(lua);
 
 
