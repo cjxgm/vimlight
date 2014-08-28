@@ -24,6 +24,7 @@ namespace vimlight
 
 			lib["request"] = [](lua::state& s) {
 				if (!inited) s.error("not initialized");
+
 				worker::source_type src;
 				s.get(src, 1);
 				worker::request(std::move(src));
@@ -33,9 +34,10 @@ namespace vimlight
 			lib["get"] = [](lua::state& s) {
 				if (!inited) s.error("not initialized");
 				if (!worker::done()) return 0;
+
 				auto cmds = worker::get();
 				s.table(cmds.size(), 0);
-				for (int i=0; i<cmds.size(); i++) {
+				for (decltype(cmds.size()) i=0; i<cmds.size(); i++) {
 					s.push(cmds[i]);
 					s.field(-2, i+1);
 				}
@@ -44,6 +46,7 @@ namespace vimlight
 
 			lib["name"] = [](lua::state& s) {
 				if (!inited) s.error("not initialized");
+
 				worker::filename_type f;
 				s.get(f, 1);
 				worker::name(std::move(f));

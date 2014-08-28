@@ -52,6 +52,7 @@ namespace clang
 				raw_cursor_type parent,
 				void* data)
 		{
+#pragma unused(parent)
 			clang::cursor cu(cursor);
 			auto visitor = reinterpret_cast<const visitor_type*>(data);
 			const visitor_type& visit = *visitor;

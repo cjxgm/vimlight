@@ -57,7 +57,7 @@ namespace clang
 			diagnostics_type diags;
 			auto size = c::diagnostic::get_count(get());
 			diags.reserve(size);
-			for (int i=0; i<size; i++)
+			for (decltype(size) i=0; i<size; i++)
 				diags.emplace_back(c::diagnostic::get(get(), i));
 			return std::move(diags);
 		}
