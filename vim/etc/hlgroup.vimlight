@@ -1,6 +1,8 @@
-TypeRef			Type
-NamespaceRef	Special
-TemplateRef		MoreMsg
-FunctionRef		MoreMsg
-error			Error
-init_list_brace	Define
+TypeRef				Type
+NamespaceRef		Special
+TemplateRef			Label
+OverloadedDeclRef	SignColumn	# unresolved_function_ref_(overloaded)
+VariableRef			Underlined	# variable_name_in_lambda's_capture_list
+error				Error
+init_list_brace		Define
+
