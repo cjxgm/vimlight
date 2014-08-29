@@ -16,7 +16,8 @@ namespace vimlight
 			  vim_name_type vname;
 
 			while (f >> cname >> vname)
-				table[cname] = vname;
+				if (cname != "#")	// skip comment
+					table[cname] = vname;
 		}
 	}
 };
