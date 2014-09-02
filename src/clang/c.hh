@@ -18,63 +18,14 @@ namespace clang
 {
 	namespace c
 	{
-// this macro is used to create type alias
-// i call it "type forwarding"
-//
-// usage:
-// 		// create type alias:
-// 		namespace index { FORWARD_TYPE(Index); }
-//
-// 		// equivalent to:
-// 		namespace index { using type = CXIndex; }
-//
-// 		// using the aliased type
-// 		index::type x;
-//
 #define FORWARD_TYPE(NAME) \
 		using type = ::CX ## NAME
 
-// this macro is used to automatically deduce the return
-// type in c++11 by the returned expression. this macro
-// can only be used with functions that have only 1 single
-// return statement.
-//
-// usage:
-// 		auto func()
-// 			RETURN(1+1);
-//
-// equivalent to c++14 code:
-// 		decltype(auto) func()
-// 		{
-// 			return 1+1;
-// 		}
-//
-#define RETURN(EXPR) -> decltype(EXPR) { return EXPR; }
-
-// this macro is used to create function alias in c++11.
-// i call it "perfect function forwarding"
-//
-// usage:
-// 		// create type alias:
-// 		namespace index { FORWARD_FUNC(dispose, disposeIndex); }
-//
-// 		// equivalent to this code in c++14:
-// 		namespace index
-// 		{
-//			template <class ...Args>
-//			inline decltype(auto) dispose(Args&& ...args)
-//			{
-//				return clang_disposeIndex(std::forward<Args>(args)...);
-//			}
-// 		}
-//
-// 		// using the aliased function
-// 		index::dispose(x);
-//
 #define FORWARD_FUNC(NAME, CNAME) \
-		template <class ...Args> \
-		inline auto NAME (Args&& ...args) \
-			RETURN(clang_ ## CNAME (std::forward<Args>(args)...));
+		constexpr auto NAME = ::clang_ ## CNAME
+
+#define FORWARD_ENUM(NAME, CNAME) \
+		constexpr auto NAME = ::CX ## CNAME
 
 
 
@@ -96,8 +47,8 @@ namespace clang
 			namespace flag
 			{
 				FORWARD_TYPE(TranslationUnit_Flags);
-				constexpr auto none = CXTranslationUnit_None;
-				constexpr auto incomplete = CXTranslationUnit_Incomplete;
+				FORWARD_ENUM(none, TranslationUnit_None);
+				FORWARD_ENUM(incomplete, TranslationUnit_Incomplete);
 			};
 		};
 
@@ -112,9 +63,9 @@ namespace clang
 				namespace visit_result
 				{
 					FORWARD_TYPE(ChildVisitResult);
-					constexpr auto into = CXChildVisit_Recurse;
-					constexpr auto next = CXChildVisit_Continue;
-					constexpr auto stop = CXChildVisit_Break;
+					FORWARD_ENUM(into, ChildVisit_Recurse);
+					FORWARD_ENUM(next, ChildVisit_Continue);
+					FORWARD_ENUM(stop, ChildVisit_Break);
 				};
 				FORWARD_FUNC(visit, visitChildren);
 			};
@@ -172,8 +123,8 @@ namespace clang
 
 
 
+#undef FORWARD_ENUM
 #undef FORWARD_FUNC
-#undef RETURN
 #undef FORWARD_TYPE
 	};
 };
