@@ -38,13 +38,13 @@ namespace vimlight
 				vimlight::vim vim;
 				vimlight::analyzer analyzer;
 				highlight::group group(hlgroup);
-				highlight::delta delta;
+				highlight::collector collector;
 				chn_main.post(event_done{});
 
 				chn_worker.listen<event_request>([&](event_request ev) {
 					log << "(worker) parse request\n";
 					auto result = analyzer.parse(ev.src, group);
-					delta.update(result, vim);
+					collector.update(result, vim);
 					chn_main.post(event_done{});
 					chn_main.post(event_result{std::move(vim.get())});
 				});
