@@ -30,7 +30,7 @@ namespace vimlight
 		};
 
 
-		void start(const filename_type& hlgroup)
+		void start(filename_type const& hlgroup)
 		{
 			auto rm_done = chn_main.listen<event_done>([] {});
 

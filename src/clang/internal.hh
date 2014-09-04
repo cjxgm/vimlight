@@ -15,11 +15,11 @@ namespace clang
 
 			virtual ~bin() = default;
 
-			const value_type& get() const { return value; }
+			value_type const& get() const { return value; }
 			operator value_type() const { return get(); }
 
 		protected:
-			void set(const value_type& v) { value = v; }
+			void set(value_type const& v) { value = v; }
 
 		private:
 			value_type value;
@@ -35,8 +35,8 @@ namespace clang
 			guard() : owned(false) {}
 			guard(value_type value) : super_type(value), owned(true) {}
 
-			guard(const self_type&) = delete;
-			self_type& operator=(const self_type&) = delete;
+			guard(self_type const&) = delete;
+			self_type& operator=(self_type const&) = delete;
 
 			guard(self_type&& other) : super_type(other.get()), owned(true)
 			{

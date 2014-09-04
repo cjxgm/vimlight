@@ -20,9 +20,9 @@ namespace vimlight
 		struct event
 		{
 			event() = default;
-			event(const event&) = default;
+			event(event const&) = default;
 			event(event&&) = default;
-			event& operator=(const event&) = default;
+			event& operator=(event const&) = default;
 			event& operator=(event&&) = default;
 			virtual ~event() = default;
 		};

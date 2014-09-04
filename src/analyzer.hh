@@ -14,8 +14,8 @@ namespace vimlight
 
 		analyzer() : index(), tu(index) {}
 
-		list_type parse(const source_type& src, const group_type& group);
-		void name(const filename_type& file) { tu.name(file); }
+		list_type parse(source_type const& src, group_type const& group);
+		void name(filename_type const& file) { tu.name(file); }
 
 	private:
 		clang::index index;

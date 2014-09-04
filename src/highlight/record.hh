@@ -16,7 +16,7 @@ namespace vimlight
 			 name_type name;
 		};
 
-		inline bool operator==(const record& lhs, const record& rhs)
+		inline bool operator==(record const& lhs, record const& rhs)
 		{
 			return
 				(lhs.y1 == rhs.y1) &&
@@ -26,7 +26,7 @@ namespace vimlight
 				(lhs.name == rhs.name);
 		}
 
-		inline bool operator!=(const record& lhs, const record& rhs)
+		inline bool operator!=(record const& lhs, record const& rhs)
 		{
 			return
 				(lhs.y1 != rhs.y1) ||

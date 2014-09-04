@@ -5,8 +5,8 @@
 namespace vimlight
 {
 	auto analyzer::parse(
-			const source_type& src,
-			const  group_type& group) -> list_type
+			source_type const& src,
+			 group_type const& group) -> list_type
 	{
 		list_type list;
 		tu.parse(src);
@@ -29,7 +29,7 @@ namespace vimlight
 			log << "\t\t" << pos.y << ", " << pos.x << '\n';
 		}
 
-		tu.cursor().each_child([&](const clang::cursor& cursor) {
+		tu.cursor().each_child([&](clang::cursor const& cursor) {
 			auto range = cursor.range();
 			auto head = range.head();
 			if (!head.is_from_main())

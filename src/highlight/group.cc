@@ -9,7 +9,7 @@ namespace vimlight
 {
 	namespace highlight
 	{
-		void group::load(const filename_type& fn)
+		void group::load(filename_type const& fn)
 		{
 			std::ifstream f(fn);
 

@@ -13,7 +13,7 @@ namespace clang
 		using self_type = cursor;
 		using super_type = internal::bin<c::cursor::type>;
 		using name_type = std::string;
-		using visitor_type = std::function<bool(const self_type&)>;
+		using visitor_type = std::function<bool(self_type const&)>;
 
 
 
@@ -38,7 +38,7 @@ namespace clang
 		kind kind() const { return c::cursor::get_kind(get()); }
 		name_type name() const { return clang::string{c::cursor::get_spelling(get())}; }
 
-		void each_child(const visitor_type& visitor) const
+		void each_child(visitor_type const& visitor) const
 		{
 			c::cursor::childs::visit(get(), &raw_visitor,
 					const_cast<visitor_type*>(&visitor));
@@ -54,8 +54,8 @@ namespace clang
 		{
 #pragma unused(parent)
 			clang::cursor cu(cursor);
-			auto visitor = reinterpret_cast<const visitor_type*>(data);
-			const visitor_type& visit = *visitor;
+			auto visitor = reinterpret_cast<visitor_type const*>(data);
+			visitor_type const& visit = *visitor;
 			return (visit(cu) ?
 					c::cursor::childs::visit_result::into :
 					c::cursor::childs::visit_result::next);

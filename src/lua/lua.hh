@@ -32,8 +32,8 @@ namespace lua
 		~state() { if (owned) lua_close(rs); }
 
 
-		state(const self_type&) = delete;
-		self_type& operator=(const self_type&) = delete;
+		state(self_type const&) = delete;
+		self_type& operator=(self_type const&) = delete;
 		state(self_type&&) = delete;
 		self_type& operator=(self_type&&) = delete;
 
@@ -62,7 +62,7 @@ namespace lua
 			lua_createtable(rs, narr, nrec);
 		}
 
-		void field(int index, const string_type& key)
+		void field(int index, string_type const& key)
 		{
 			lua_setfield(rs, index, key.c_str());
 		}
@@ -72,7 +72,7 @@ namespace lua
 			lua_rawseti(rs, index, key);
 		}
 
-		void push(const string_type& str)
+		void push(string_type const& str)
 		{
 			lua_pushlstring(rs, str.c_str(), str.size());
 		}
