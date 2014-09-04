@@ -11,5 +11,5 @@ namespace clang
 		index() : super_type(c::index::create(0, 0)) {}
 		~index() override { if (owned) c::index::dispose(get()); }
 	};
-};
+}
 

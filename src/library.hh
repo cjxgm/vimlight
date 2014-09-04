@@ -8,6 +8,6 @@ namespace vimlight
 	namespace library
 	{
 		int open(lua::state& s);
-	};
-};
+	}
+}
 

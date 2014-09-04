@@ -6,34 +6,32 @@
 
 namespace vimlight
 {
-	void vim::push(const command_type& cmd)
+	void vim::push(command_type const& cmd)
 	{
 		commands.push_back(cmd);
 	}
 
-	void vim::region(hlindex_type idx,
-			coord_type y1, coord_type x1,
-			coord_type y2, coord_type x2)
+	void vim::add(hlrecord_type const& rec)
 	{
-		std::stringstream ss;
-		ss	<< "syn match vimlight" << idx
-			<< " +\\%" << y1 << "l\\%" << x1 << "c"
-			<< ".*\\%" << y2 << "l\\%" << x2 << "c+";
+		std::ostringstream ss;
+		ss	<< "syn match vimlight_" << rec.name
+			<< " +\\%" << rec.y1 << "l\\%" << rec.x1 << "c"
+			<< ".*\\%" << rec.y2 << "l\\%" << rec.x2 << "c+";
 		push(ss.str());
 	}
 
-	void vim::link(hlindex_type idx, const name_type& name)
+	void vim::link(name_type const& name)
 	{
-		std::stringstream ss;
-		ss << "hi link vimlight" << idx << " " << name;
+		std::ostringstream ss;
+		ss << "hi link vimlight_" << name << " " << name;
 		push(ss.str());
 	}
 
-	void vim::clear(hlindex_type idx)
+	void vim::clear(name_type const& name)
 	{
-		std::stringstream ss;
-		ss << "syn clear vimlight" << idx;
+		std::ostringstream ss;
+		ss << "syn clear vimlight_" << name;
 		push(ss.str());
 	}
-};
+}
 

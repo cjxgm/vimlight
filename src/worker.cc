@@ -30,7 +30,7 @@ namespace vimlight
 		};
 
 
-		void start(const filename_type& hlgroup)
+		void start(filename_type const& hlgroup)
 		{
 			auto rm_done = chn_main.listen<event_done>([] {});
 
@@ -38,13 +38,13 @@ namespace vimlight
 				vimlight::vim vim;
 				vimlight::analyzer analyzer;
 				highlight::group group(hlgroup);
-				highlight::delta delta;
+				highlight::collector collector;
 				chn_main.post(event_done{});
 
 				chn_worker.listen<event_request>([&](event_request ev) {
 					log << "(worker) parse request\n";
 					auto result = analyzer.parse(ev.src, group);
-					delta.update(result, vim);
+					collector.update(result, vim);
 					chn_main.post(event_done{});
 					chn_main.post(event_result{std::move(vim.get())});
 				});
@@ -94,6 +94,6 @@ namespace vimlight
 		{
 			chn_worker.post(event_name{std::move(f)});
 		}
-	};
-};
+	}
+}
 

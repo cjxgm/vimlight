@@ -11,24 +11,24 @@ namespace clang
 		using source_type = std::string;
 		using name_type = std::string;
 
-		unsaved_file(const name_type& file, const source_type& src)
+		unsaved_file(name_type const& file, source_type const& src)
 			: file(file), src(src)
 		{
 			update();
 		}
 
-		unsaved_file(const self_type& other) = delete;
-		self_type& operator=(const self_type& other) = delete;
+		unsaved_file(self_type const& other) = delete;
+		self_type& operator=(self_type const& other) = delete;
 
-		const value_type* get() const { return &value; }
+		value_type const* get() const { return &value; }
 		      value_type* get()       { return &value; }
 		operator value_type*() { return get(); }
 
-		const name_type& name() const { return file; }
+		name_type const& name() const { return file; }
 
 	private:
-		const name_type& file;
-		const source_type& src;
+		name_type const& file;
+		source_type const& src;
 		value_type value;
 
 		void update()
@@ -38,5 +38,5 @@ namespace clang
 			value.Length   = src.size();
 		}
 	};
-};
+}
 

@@ -27,10 +27,10 @@ namespace clang
 
 		~translation_unit() override { if (owned) c::translation_unit::dispose(get()); }
 
-		void name(const filename_type& f)
+		void name(filename_type const& f)
 		{
 			clang::unsaved_file uf(f, "");
-			const char* argv[] = { "-std=gnu++1y", "-Wall", "-Wextra" };
+			char const* argv[] = { "-std=gnu++1y", "-Wall", "-Wextra" };
 			constexpr auto argc = sizeof(argv)/sizeof(*argv);
 
 			if (owned) c::translation_unit::dispose(get());
@@ -43,7 +43,7 @@ namespace clang
 			file = f;
 		}
 
-		void parse(const source_type& src)
+		void parse(source_type const& src)
 		{
 			clang::unsaved_file uf(file, src);
 			auto opt = c::options::default_reparse(get());
@@ -65,5 +65,5 @@ namespace clang
 		index_type& index;
 		filename_type file;
 	};
-};
+}
 

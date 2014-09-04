@@ -8,27 +8,22 @@ namespace vimlight
 {
 	struct vim
 	{
-		using hlindex_type = unsigned;
 		using hlrecord_type = highlight::record;
-		using coord_type = hlrecord_type::coord_type;
-		using  name_type = hlrecord_type:: name_type;
+		using name_type = hlrecord_type::name_type;
 		using command_type = std::string;
 		using commands_type = std::vector<command_type>;
 
-		// generate a command to add a highlighting region
+		// generate a command to link a syntax group to highlight group
 		// and add it to the commands buffer
-		void add(hlindex_type idx, hlrecord_type rec)
-		{
-			region(idx, rec.y1, rec.x1, rec.y2, rec.x2);
-			link(idx, rec.name);
-		}
+		void link(name_type const& name);
 
-		// generate a command to remove a highlighting region
+		// generate a command to clear a syntax group
 		// and add it to the commands buffer
-		void rm(hlindex_type idx)
-		{
-			clear(idx);
-		}
+		void clear(name_type const& name);
+
+		// generate a command to add a syntax group
+		// and add it to the commands buffer
+		void add(hlrecord_type const& rec);
 
 		// get the highlighting commands and clear the commands buffer
 		commands_type get()
@@ -39,12 +34,7 @@ namespace vimlight
 	private:
 		commands_type commands;
 
-		void push(const command_type& cmd);
-		void region(hlindex_type idx,
-				coord_type y1, coord_type x1,
-				coord_type y2, coord_type x2);
-		void link(hlindex_type idx, const name_type& name);
-		void clear(hlindex_type idx);
+		void push(command_type const& cmd);
 	};
-};
+}
 
