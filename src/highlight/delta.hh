@@ -16,6 +16,6 @@ namespace vimlight
 		private:
 			list_type old;
 		};
-	};
-};
+	}
+}
 

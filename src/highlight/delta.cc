@@ -18,6 +18,6 @@ namespace vimlight
 
 			old = std::move(list);
 		}
-	};
-};
+	}
+}
 

@@ -18,6 +18,6 @@ namespace vimlight
 		private:
 			table_type table;
 		};
-	};
-};
+	}
+}
 

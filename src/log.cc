@@ -3,5 +3,5 @@
 namespace vimlight
 {
 	log_system::log log;
-};
+}
 

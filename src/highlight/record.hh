@@ -16,28 +16,25 @@ namespace vimlight
 			 name_type name;
 		};
 
-		inline namespace record_helper
+		inline bool operator==(const record& lhs, const record& rhs)
 		{
-			inline bool operator==(const record& lhs, const record& rhs)
-			{
-				return
-					(lhs.y1 == rhs.y1) &&
-					(lhs.x1 == rhs.x1) &&
-					(lhs.y2 == rhs.y2) &&
-					(lhs.x2 == rhs.x2) &&
-					(lhs.name == rhs.name);
-			}
+			return
+				(lhs.y1 == rhs.y1) &&
+				(lhs.x1 == rhs.x1) &&
+				(lhs.y2 == rhs.y2) &&
+				(lhs.x2 == rhs.x2) &&
+				(lhs.name == rhs.name);
+		}
 
-			inline bool operator!=(const record& lhs, const record& rhs)
-			{
-				return
-					(lhs.y1 != rhs.y1) ||
-					(lhs.x1 != rhs.x1) ||
-					(lhs.y2 != rhs.y2) ||
-					(lhs.x2 != rhs.x2) ||
-					(lhs.name != rhs.name);
-			}
-		};
-	};
-};
+		inline bool operator!=(const record& lhs, const record& rhs)
+		{
+			return
+				(lhs.y1 != rhs.y1) ||
+				(lhs.x1 != rhs.x1) ||
+				(lhs.y2 != rhs.y2) ||
+				(lhs.x2 != rhs.x2) ||
+				(lhs.name != rhs.name);
+		}
+	}
+}
 

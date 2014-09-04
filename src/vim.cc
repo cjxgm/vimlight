@@ -35,5 +35,5 @@ namespace vimlight
 		ss << "syn clear vimlight" << idx;
 		push(ss.str());
 	}
-};
+}
 

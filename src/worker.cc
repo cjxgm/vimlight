@@ -94,6 +94,6 @@ namespace vimlight
 		{
 			chn_worker.post(event_name{std::move(f)});
 		}
-	};
-};
+	}
+}
 

@@ -117,5 +117,5 @@ namespace vimlight
 		listener_wrapper_list listeners;
 		event_list events;
 	};
-};
+}
 

@@ -61,5 +61,5 @@ namespace clang
 					c::cursor::childs::visit_result::next);
 		}
 	};
-};
+}
 

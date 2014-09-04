@@ -38,5 +38,5 @@ namespace clang
 			value.Length   = src.size();
 		}
 	};
-};
+}
 

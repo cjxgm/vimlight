@@ -186,5 +186,5 @@ namespace lua
 	using number  = state::number_type;
 	using string  = state::string_type;
 	using cfunction = state::cfunc_type;
-};
+}
 

@@ -9,5 +9,5 @@ extern "C"
 		lua::state s(rs);
 		return vimlight::library::open(s);
 	}
-};
+}
 

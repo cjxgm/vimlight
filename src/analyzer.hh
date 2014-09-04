@@ -21,5 +21,5 @@ namespace vimlight
 		clang::index index;
 		clang::translation_unit tu;
 	};
-};
+}
 

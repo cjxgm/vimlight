@@ -35,7 +35,7 @@ namespace clang
 			FORWARD_TYPE(Index);
 			FORWARD_FUNC(create, createIndex);
 			FORWARD_FUNC(dispose, disposeIndex);
-		};
+		}
 
 		namespace translation_unit
 		{
@@ -49,8 +49,8 @@ namespace clang
 				FORWARD_TYPE(TranslationUnit_Flags);
 				FORWARD_ENUM(none, TranslationUnit_None);
 				FORWARD_ENUM(incomplete, TranslationUnit_Incomplete);
-			};
-		};
+			}
+		}
 
 		namespace cursor
 		{
@@ -66,49 +66,49 @@ namespace clang
 					FORWARD_ENUM(into, ChildVisit_Recurse);
 					FORWARD_ENUM(next, ChildVisit_Continue);
 					FORWARD_ENUM(stop, ChildVisit_Break);
-				};
+				}
 				FORWARD_FUNC(visit, visitChildren);
-			};
+			}
 			namespace kind
 			{
 				FORWARD_TYPE(CursorKind);
 				FORWARD_FUNC(get_spelling, getCursorKindSpelling);
 				FORWARD_FUNC(is_declaration, isDeclaration);
 				FORWARD_FUNC(is_reference, isReference);
-			};
-		};
+			}
+		}
 
 		namespace range
 		{
 			FORWARD_TYPE(SourceRange);
 			FORWARD_FUNC(get_start, getRangeStart);
 			FORWARD_FUNC(get_end, getRangeEnd);
-		};
+		}
 
 		namespace location
 		{
 			FORWARD_TYPE(SourceLocation);
 			FORWARD_FUNC(get_spelling, getSpellingLocation);
 			FORWARD_FUNC(is_from_main_file, Location_isFromMainFile);
-		};
+		}
 
 		namespace string
 		{
 			FORWARD_TYPE(String);
 			FORWARD_FUNC(dispose, disposeString);
 			FORWARD_FUNC(cstr, getCString);
-		};
+		}
 
 		namespace unsaved_file
 		{
 			FORWARD_TYPE(UnsavedFile);
-		};
+		}
 
 		namespace options
 		{
 			FORWARD_FUNC(default_reparse, defaultReparseOptions);
 			FORWARD_FUNC(default_diagnostic_display, defaultDiagnosticDisplayOptions);
-		};
+		}
 
 		namespace diagnostic
 		{
@@ -118,7 +118,7 @@ namespace clang
 			FORWARD_FUNC(get_count, getNumDiagnostics);
 			FORWARD_FUNC(get_location, getDiagnosticLocation);
 			FORWARD_FUNC(format, formatDiagnostic);
-		};
+		}
 
 
 
@@ -126,6 +126,6 @@ namespace clang
 #undef FORWARD_ENUM
 #undef FORWARD_FUNC
 #undef FORWARD_TYPE
-	};
-};
+	}
+}
 

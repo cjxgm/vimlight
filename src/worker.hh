@@ -34,6 +34,6 @@ namespace vimlight
 
 		// rename the current editing source file
 		void name(filename_type f);
-	};
-};
+	}
+}
 

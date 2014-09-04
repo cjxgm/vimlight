@@ -56,6 +56,6 @@ namespace vimlight
 			s.push(lib);
 			return 1;
 		}
-	};
-};
+	}
+}
 

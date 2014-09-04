@@ -65,5 +65,5 @@ namespace clang
 		index_type& index;
 		filename_type file;
 	};
-};
+}
 

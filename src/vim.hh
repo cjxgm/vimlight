@@ -46,5 +46,5 @@ namespace vimlight
 		void link(hlindex_type idx, const name_type& name);
 		void clear(hlindex_type idx);
 	};
-};
+}
 

@@ -7,6 +7,6 @@ namespace vimlight
 	namespace highlight
 	{
 		using list = std::vector<record>;
-	};
-};
+	}
+}
 

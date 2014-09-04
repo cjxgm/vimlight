@@ -26,5 +26,5 @@ namespace clang
 						c::options::default_diagnostic_display())};
 		}
 	};
-};
+}
 

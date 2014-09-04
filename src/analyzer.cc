@@ -80,5 +80,5 @@ namespace vimlight
 
 		return std::move(list);
 	}
-};
+}
 

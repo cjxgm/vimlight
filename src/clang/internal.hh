@@ -53,6 +53,6 @@ namespace clang
 		protected:
 			bool owned;
 		};
-	};
-};
+	}
+}
 

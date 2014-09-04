@@ -17,5 +17,5 @@ namespace clang
 		operator cstring_type() const { return c::string::cstr(get()); }
 		operator  string_type() const { return operator cstring_type(); }
 	};
-};
+}
 

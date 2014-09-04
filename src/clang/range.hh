@@ -15,5 +15,5 @@ namespace clang
 		location head() const { return c::range::get_start(get()); }
 		location tail() const { return c::range::get_end  (get()); }
 	};
-};
+}
 

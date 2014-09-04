@@ -20,5 +20,5 @@ namespace vimlight
 					table[cname] = vname;
 		}
 	}
-};
+}
 
