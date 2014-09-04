@@ -10,6 +10,8 @@ namespace vimlight
 		{
 			using table_type = std::unordered_map<clang_name_type, vim_name_type>;
 
+			struct bad_file {};
+
 			group() {}
 			group(const filename_type& fn) { load(fn); }
 			void load(const filename_type& fn);
