@@ -14,7 +14,7 @@ namespace vimlight
 	void vim::add(hlrecord_type const& rec)
 	{
 		std::ostringstream ss;
-		ss	<< "syn match vimlight" << rec.name
+		ss	<< "syn match vimlight_" << rec.name
 			<< " +\\%" << rec.y1 << "l\\%" << rec.x1 << "c"
 			<< ".*\\%" << rec.y2 << "l\\%" << rec.x2 << "c+";
 		push(ss.str());
@@ -23,14 +23,14 @@ namespace vimlight
 	void vim::link(name_type const& name)
 	{
 		std::ostringstream ss;
-		ss << "hi link vimlight" << name << " " << name;
+		ss << "hi link vimlight_" << name << " " << name;
 		push(ss.str());
 	}
 
 	void vim::clear(name_type const& name)
 	{
 		std::ostringstream ss;
-		ss << "syn clear vimlight" << name;
+		ss << "syn clear vimlight_" << name;
 		push(ss.str());
 	}
 }
