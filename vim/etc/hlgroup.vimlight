@@ -1,8 +1,22 @@
-TypeRef				Type
-NamespaceRef		Special
-TemplateRef			Label
-OverloadedDeclRef	SignColumn	# unresolved_function_ref_(overloaded)
-VariableRef			Underlined	# variable_name_in_lambda's_capture_list
-error				Error
-init_list_brace		Define
+#
+# highlight group definition file
+#
+# left hand side CamelCase:
+#		output from clang
+#
+# left hand side lowercase_underscore:
+#		analyzer's output by analyzing the output from clang
+#
+# right hand side CamelCase:
+#		highlight group in vim.
+#		you can see a list of highlight groups by :hi<CR> in vim
+#
+
+TypeRef				Type		# type (class/struct/union), excluding int, double, etc.
+NamespaceRef		Special		# namespace
+TemplateRef			Label		# template
+OverloadedDeclRef	SignColumn	# unresolved function ref (because of overloading and templating)
+VariableRef			Underlined	# variable name in lambda's capture list
+error				Error		# error
+init_list_brace		Define		# initializer list's brace
 
