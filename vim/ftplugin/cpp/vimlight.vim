@@ -11,6 +11,7 @@ endif
 let b:did_vimlight = 1
 
 au BufEnter		* call vimlight#rename()
+au BufLeave		* call vimlight#finish()
 au TextChanged	* call vimlight#modify()
 au TextChangedI	* call vimlight#modify()
 au CursorHold	* call vimlight#update()
