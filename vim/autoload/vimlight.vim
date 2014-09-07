@@ -31,6 +31,13 @@ lua <<END
 			end
 			this.done = true
 		end
+		return this.done
+	end
+
+	vl.finish = function(this)
+		while not this.done do
+			this:apply()
+		end
 	end
 
 	vl.update = function(this)
@@ -70,5 +77,9 @@ endf
 function vimlight#rename()
 	lua vimlight:rename()
 	call vimlight#modify()
+endf
+
+function vimlight#finish()
+	lua vimlight:finish()
 endf
 
