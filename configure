@@ -7,7 +7,6 @@
 
 
 my $CC = "clang++";
-my $LD = "clang++";
 my $CCFLAGS = "-std=gnu++11 -march=native -O3 -Wall -Wextra -fPIC";
 my $LDFLAGS = "-pthread -lclang -shared";
 my $name = "vimlight";
@@ -56,8 +55,8 @@ sub write_makefile
 LOG = no
 LOG_SYSTEM = \$(LOG)_log
 
-CC = $CC
-LD = $LD
+CXX = $CC
+LD = \$(CXX)
 CCFLAGS = $CCFLAGS -DLOG_SYSTEM=\$(LOG_SYSTEM)
 LDFLAGS = $LDFLAGS
 
@@ -66,7 +65,7 @@ EOF
 	print $makefile "LDFLAGS += `pkg-config --libs   $_`\n" for @libs;
 	print $makefile <<EOF;
 
-.PHONY: all clean cleanall rebuild reconf test bundle commit install uninstall
+.PHONY: all clean cleanall rebuild reconf test bundle commit install uninstall analyze
 
 all: init app
 clean: makefile
@@ -103,6 +102,8 @@ install: bundle uninstall
 uninstall:
 	\@echo -e "\e[0;32muninstalling" "\e[1;35m$name\e[0m"
 	rm -rf ~/.vim/bundle/vimlight/
+analyze: clean
+	scan-build -V --use-c++=$CC make
 
 init: makefile build @dirs
 app: makefile $dest
@@ -118,7 +119,7 @@ EOF
 	print $makefile <<EOF for keys %targets;
 $_:$targets{$_} makefile
 	\@echo -e "\e[0;32mcompiling" "\e[1;35m\$@\e[0m"
-	\$(CC) -c -o \$@ \$< \$(CCFLAGS)
+	\$(CXX) -c -o \$@ \$< \$(CCFLAGS)
 EOF
 	print $makefile <<EOF;
 $dest: @{[keys %targets]}
