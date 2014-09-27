@@ -58,6 +58,8 @@ namespace clang
 			FORWARD_FUNC(get_extent, getCursorExtent);
 			FORWARD_FUNC(get_kind, getCursorKind);
 			FORWARD_FUNC(get_spelling, getCursorSpelling);
+			FORWARD_FUNC(get_type, getCursorType);
+			FORWARD_FUNC(get_referenced, getCursorReferenced);
 			namespace childs
 			{
 				namespace visit_result
@@ -90,6 +92,7 @@ namespace clang
 			FORWARD_TYPE(SourceLocation);
 			FORWARD_FUNC(get_spelling, getSpellingLocation);
 			FORWARD_FUNC(is_from_main_file, Location_isFromMainFile);
+			FORWARD_FUNC(get_file, getFileLocation);
 		}
 
 		namespace string
@@ -102,6 +105,12 @@ namespace clang
 		namespace unsaved_file
 		{
 			FORWARD_TYPE(UnsavedFile);
+		}
+
+		namespace file
+		{
+			FORWARD_TYPE(File);
+			FORWARD_FUNC(get_name, getFileName);
 		}
 
 		namespace options
