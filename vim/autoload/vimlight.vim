@@ -61,6 +61,9 @@ lua <<END
 END
 
 function vimlight#update()
+	if &ft != "cpp"
+		return
+	endif
 lua <<END
 	vimlight:apply()
 	if vimlight.modified then
@@ -75,6 +78,9 @@ function vimlight#modify()
 endf
 
 function vimlight#rename()
+	if &ft != "cpp"
+		return
+	endif
 	lua vimlight:rename()
 	call vimlight#modify()
 endf
