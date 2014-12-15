@@ -38,10 +38,18 @@ namespace vimlight
 			auto head_pos =       head  .position();
 			auto tail_pos = range.tail().position();
 			auto kind = cursor.kind().name();
+			auto name = cursor.name();
 			log << "\t[" << kind << "]\n"
-				<< "\t\t\"" << cursor.name() << "\"\n"
+				<< "\t\t\"" << name << "\"\n"
 				<< "\t\t" << head_pos.y << ", " << head_pos.x
 				<< " -> " << tail_pos.y << ", " << tail_pos.x << '\n';
+			log << "\t\t{" << head.file() << "}\n";
+
+			auto ref = cursor.reference();
+			auto ref_kind = ref.kind().name();
+			log << "\t\t::[" << ref_kind << "]\n"
+				<< "\t\t\t\"" << ref.name() << "\"\n"
+				<< "\t\t\t{" << ref.range().head().file() << "}\n";
 
 			try {
 				if (kind == "InitListExpr") {
@@ -59,6 +67,56 @@ namespace vimlight
 							kind });
 					list.push_back({
 							tail_pos.y, tail_pos.x-1,
+							tail_pos.y, tail_pos.x,
+							kind });
+					log << "\t\t" << kind << '\n';
+				}
+
+				else if (kind == "DeclRefExpr" && ref_kind == "FunctionDecl" &&
+						name.size() < tail_pos.x-head_pos.x) {
+					auto kind = group.at("template_function_call");
+					list.push_back({
+							head_pos.y, head_pos.x,
+							head_pos.y, head_pos.x+int(name.size()),
+							kind });
+					log << "\t\t" << kind << '\n';
+				}
+
+				else if (kind == "DeclRefExpr" && ref_kind == "FunctionDecl") {
+					// skip operator
+					if (name.size() > tail_pos.x-head_pos.x)
+						return true;
+					// FIXME: not work for "std::move(...)"
+					auto kind = group.at("function_call");
+					list.push_back({
+							head_pos.y, head_pos.x,
+							head_pos.y, head_pos.x+int(name.size()),
+							kind });
+					log << "\t\t" << kind << '\n';
+				}
+
+				else if (kind == "MemberRefExpr" && ref_kind == "CXXMethod") {
+					auto kind = group.at("member_call");
+					list.push_back({
+							tail_pos.y, tail_pos.x-int(name.size()),
+							tail_pos.y, tail_pos.x,
+							kind });
+					log << "\t\t" << kind << '\n';
+				}
+
+				else if (kind == "DeclRefExpr" && ref_kind == "ParmDecl") {
+					auto kind = group.at("parameter");
+					list.push_back({
+							head_pos.y, head_pos.x,
+							tail_pos.y, tail_pos.x,
+							kind });
+					log << "\t\t" << kind << '\n';
+				}
+
+				else if (kind == "MemberRefExpr" && ref_kind == "FieldDecl") {
+					auto kind = group.at("member");
+					list.push_back({
+							tail_pos.y, tail_pos.x-int(name.size()),
 							tail_pos.y, tail_pos.x,
 							kind });
 					log << "\t\t" << kind << '\n';

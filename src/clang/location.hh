@@ -1,6 +1,8 @@
 #pragma once
 #include "c.hh"
 #include "internal.hh"
+#include "string.hh"
+#include <string>
 
 namespace clang
 {
@@ -8,6 +10,7 @@ namespace clang
 	{
 		using self_type = location;
 		using super_type = internal::bin<c::location::type>;
+		using name_type = std::string;
 
 		struct position
 		{
@@ -29,6 +32,14 @@ namespace clang
 			c::location::get_spelling(get(), nullptr,
 					&pos.y, &pos.x, nullptr);
 			return pos;
+		}
+
+		name_type file() const
+		{
+			c::file::type f;
+			c::location::get_file(get(), &f, nullptr, nullptr, nullptr);
+			if (f) return clang::string{c::file::get_name(f)};
+			return "";
 		}
 	};
 }

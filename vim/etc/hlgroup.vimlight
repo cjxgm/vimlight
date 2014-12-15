@@ -12,11 +12,18 @@
 #		you can see a list of highlight groups by :hi<CR> in vim
 #
 
-TypeRef				Type		# type (class/struct/union), excluding int, double, etc.
+TypeRef				Type		# type (class/struct/union), excluding builtin types: int, double, etc.
 NamespaceRef		Special		# namespace
 TemplateRef			Label		# template
 OverloadedDeclRef	SignColumn	# unresolved function ref (because of overloading and templating)
 VariableRef			Underlined	# variable name in lambda's capture list
 error				Error		# error
 init_list_brace		Define		# initializer list's brace
+template_function_call		Function	# highlight "func" in "func<type>(arg)"
+
+# TODO: they are too slow when enabled
+#function_call		IncSearch
+#member_call		Search
+#member				VisualNOS
+#parameter			TabLine
 

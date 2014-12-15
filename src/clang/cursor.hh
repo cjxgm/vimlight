@@ -37,6 +37,7 @@ namespace clang
 		range range() const { return c::cursor::get_extent(get()); }
 		kind kind() const { return c::cursor::get_kind(get()); }
 		name_type name() const { return clang::string{c::cursor::get_spelling(get())}; }
+		cursor reference() const { return clang::cursor{c::cursor::get_referenced((get()))}; }
 
 		void each_child(visitor_type const& visitor) const
 		{
@@ -52,7 +53,7 @@ namespace clang
 				raw_cursor_type parent,
 				void* data)
 		{
-#pragma unused(parent)
+			#pragma unused(parent)
 			clang::cursor cu(cursor);
 			auto visitor = reinterpret_cast<visitor_type const*>(data);
 			visitor_type const& visit = *visitor;
