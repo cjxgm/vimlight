@@ -19,12 +19,3 @@ au CursorHoldI	* call vimlight#update()
 au CursorMoved	* call vimlight#update()
 au CursorMovedI	* call vimlight#update()
 
-syn match cppFunction "\zs\w\+\ze\s*("
-hi def link cppFunction Function
-
-syn match cppBinNumber "0b[01]\+"
-hi def link cppBinNumber cNumber
-
-syn match cppNamespaceSep "::"
-hi def link cppNamespaceSep Special
-
