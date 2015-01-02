@@ -13,7 +13,7 @@ let g:loaded_vimlight = 1
 lua <<END
 	local root = vim.eval[[expand("<sfile>:h:h")]]
 	package.cpath = ("%s;%s/lib/?.so"):format(package.cpath, root)
-	vimlight = require 'vimlight'
+	vimlight = require 'vimlight'	-- global variable intentionally
 	local vl = vimlight
 
 	vl.init(root .. "/etc/hlgroup.vimlight")
