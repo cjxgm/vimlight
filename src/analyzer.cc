@@ -11,6 +11,7 @@ namespace vimlight
 		list_type list;
 		tu.parse(src);
 
+		// analyze errors
 		auto diags = tu.diagnostics();
 		log << "analyzer::parse():\n";
 		for (auto& diag: diags) {
@@ -29,6 +30,7 @@ namespace vimlight
 			log << "\t\t" << pos.y << ", " << pos.x << '\n';
 		}
 
+		// semantic highlighting
 		tu.cursor().each_child([&](clang::cursor const& cursor) {
 			auto range = cursor.range();
 			auto head = range.head();
@@ -69,7 +71,7 @@ namespace vimlight
 							tail_pos.y, tail_pos.x-1,
 							tail_pos.y, tail_pos.x,
 							kind });
-					log << "\t\t" << kind << '\n';
+					log << "\t\t" << kind << " (initializer list brace)\n";
 				}
 
 				else if (kind == "DeclRefExpr" && ref_kind == "FunctionDecl" &&
@@ -79,7 +81,7 @@ namespace vimlight
 							head_pos.y, head_pos.x,
 							head_pos.y, head_pos.x+int(name.size()),
 							kind });
-					log << "\t\t" << kind << '\n';
+					log << "\t\t\"" << name << "\" " << kind << " (template function call)\n";
 				}
 
 				else if (kind == "DeclRefExpr" && ref_kind == "FunctionDecl") {
@@ -92,7 +94,7 @@ namespace vimlight
 							head_pos.y, head_pos.x,
 							head_pos.y, head_pos.x+int(name.size()),
 							kind });
-					log << "\t\t" << kind << '\n';
+					log << "\t\t" << kind << " (function call)\n";
 				}
 
 				else if (kind == "MemberRefExpr" && ref_kind == "CXXMethod") {
@@ -101,7 +103,7 @@ namespace vimlight
 							tail_pos.y, tail_pos.x-int(name.size()),
 							tail_pos.y, tail_pos.x,
 							kind });
-					log << "\t\t" << kind << '\n';
+					log << "\t\t" << kind << " (member call)\n";
 				}
 
 				else if (kind == "DeclRefExpr" && ref_kind == "ParmDecl") {
@@ -110,7 +112,7 @@ namespace vimlight
 							head_pos.y, head_pos.x,
 							tail_pos.y, tail_pos.x,
 							kind });
-					log << "\t\t" << kind << '\n';
+					log << "\t\t" << kind << " (parameter)\n";
 				}
 
 				else if (kind == "MemberRefExpr" && ref_kind == "FieldDecl") {
@@ -119,7 +121,7 @@ namespace vimlight
 							tail_pos.y, tail_pos.x-int(name.size()),
 							tail_pos.y, tail_pos.x,
 							kind });
-					log << "\t\t" << kind << '\n';
+					log << "\t\t" << kind << " (member)\n";
 				}
 
 				else {
@@ -127,7 +129,7 @@ namespace vimlight
 							head_pos.y, head_pos.x,
 							tail_pos.y, tail_pos.x,
 							group.at(kind) });
-					log << "\t\t" << group.at(kind) << '\n';
+					log << "\t\t" << group.at(kind) << " (" << kind << ")\n";
 				}
 				return true;
 			}
