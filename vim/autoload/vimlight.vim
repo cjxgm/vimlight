@@ -13,7 +13,7 @@ let g:loaded_vimlight = 1
 lua <<END
 	local root = vim.eval[[expand("<sfile>:h:h")]]
 	package.cpath = ("%s;%s/lib/?.so"):format(package.cpath, root)
-	vimlight = require 'vimlight'
+	vimlight = require 'vimlight'	-- global variable intentionally
 	local vl = vimlight
 
 	vl.init(root .. "/etc/hlgroup.vimlight")
@@ -81,6 +81,14 @@ function vimlight#rename()
 	if &ft != "cpp"
 		return
 	endif
+
+	syn match cppFunction "\zs\w\+\ze\s*("
+	hi def link cppFunction Function
+	syn match cppBinNumber "0b[01]\+"
+	hi def link cppBinNumber cNumber
+	syn match cppNamespaceSep "::"
+	hi def link cppNamespaceSep Special
+
 	lua vimlight:rename()
 	call vimlight#modify()
 endf

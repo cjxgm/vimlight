@@ -2,6 +2,7 @@
 #include "c.hh"
 #include "internal.hh"
 #include "range.hh"
+#include "location.hh"
 #include "string.hh"
 #include <string>
 #include <functional>
@@ -13,6 +14,7 @@ namespace clang
 		using self_type = cursor;
 		using super_type = internal::bin<c::cursor::type>;
 		using name_type = std::string;
+		using identifier_type = std::string;
 		using visitor_type = std::function<bool(self_type const&)>;
 
 
@@ -35,9 +37,23 @@ namespace clang
 		cursor(value_type value) : super_type(value) {}
 
 		range range() const { return c::cursor::get_extent(get()); }
+		location location() const { return c::cursor::get_location(get()); }
 		kind kind() const { return c::cursor::get_kind(get()); }
 		name_type name() const { return clang::string{c::cursor::get_spelling(get())}; }
 		cursor reference() const { return clang::cursor{c::cursor::get_referenced((get()))}; }
+
+		identifier_type identifier() const
+		{
+			using std::to_string;
+			intptr_t data[] = {
+				reinterpret_cast<intptr_t>(get().data[0]),
+				reinterpret_cast<intptr_t>(get().data[1]),
+				reinterpret_cast<intptr_t>(get().data[2]),
+			};
+			return	to_string(data[0]) + ":" +
+					to_string(data[1]) + ":" +
+					to_string(data[2]);
+		}
 
 		void each_child(visitor_type const& visitor) const
 		{

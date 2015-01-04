@@ -1,4 +1,5 @@
 #pragma once
+#include "../log.hh"
 #include "c.hh"
 #include "internal.hh"
 #include "unsaved_file.hh"
@@ -48,6 +49,8 @@ namespace clang
 			clang::unsaved_file uf(file, src);
 			auto opt = c::options::default_reparse(get());
 			c::translation_unit::reparse(get(), 1, uf, opt);
+
+			visualize();
 		}
 
 		cursor cursor() const { return c::translation_unit::get_cursor(get()); }
@@ -61,6 +64,14 @@ namespace clang
 				diags.emplace_back(c::diagnostic::get(get(), i));
 			return std::move(diags);
 		}
+
+		void visualize()
+#ifdef LOG
+		;
+#else
+		{}
+#endif
+
 	private:
 		index_type& index;
 		filename_type file;

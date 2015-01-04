@@ -74,10 +74,8 @@ namespace vimlight
 			static_assert(std::is_base_of<event, Event>(),
 					"Event must be a sub-class of channel::event");
 
-			{
-				lock _(m);
-				events.push_back(std::make_shared<Event>(std::move(ev)));
-			}
+			lock _(m);
+			events.push_back(std::make_shared<Event>(std::move(ev)));
 			cv.notify_one();
 		}
 
