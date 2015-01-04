@@ -56,6 +56,7 @@ namespace clang
 		{
 			FORWARD_TYPE(Cursor);
 			FORWARD_FUNC(get_extent, getCursorExtent);
+			FORWARD_FUNC(get_location, getCursorLocation);
 			FORWARD_FUNC(get_kind, getCursorKind);
 			FORWARD_FUNC(get_spelling, getCursorSpelling);
 			FORWARD_FUNC(get_type, getCursorType);
