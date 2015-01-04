@@ -19,11 +19,11 @@ OverloadedDeclRef	SignColumn	# unresolved function ref (because of overloading a
 VariableRef			Underlined	# variable name in lambda's capture list
 error				Error		# error
 init_list_brace		Define		# initializer list's brace
-template_function_call		Function	# highlight "func" in "func<type>(arg)"
+special_function_call	Function	# highlight "func" in "ns::func<type>(arg)"
+special_member_call		Function	# highlight "func" in "obj.func<type>(arg)"
 
-# TODO: they are too slow when enabled
-#function_call		IncSearch
-#member_call		Search
+# FIXME: they are too slow when enabled
+#operator_call		Label
 #member				VisualNOS
 #parameter			TabLine
 
