@@ -56,7 +56,7 @@ lua <<END
 	vl.rename = function(this)
 		local file = vim.eval("expand('%')")
 		if file == "" then file = "source.cc" end
-		this.name(file)
+		this.setup(file, "TODO")
 	end
 END
 

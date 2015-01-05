@@ -23,10 +23,12 @@ namespace vimlight
 			commands_type cmds;
 			event_result(commands_type cmds) : cmds{std::move(cmds)} {}
 		};
-		struct event_name : public channel::event
+		struct event_setup : public channel::event
 		{
 			filename_type name;
-			event_name(filename_type name) : name{std::move(name)} {}
+			option_type option;
+			event_setup(filename_type name, option_type option)
+				: name{std::move(name)}, option{std::move(option)} {}
 		};
 
 
@@ -49,9 +51,10 @@ namespace vimlight
 					chn_main.post(event_result{std::move(vim.get())});
 				});
 
-				chn_worker.listen<event_name>([&](event_name ev) {
+				chn_worker.listen<event_setup>([&](event_setup ev) {
 					log << "(worker) name: " << ev.name << '\n';
-					analyzer.name(ev.name);
+					log << "(worker) option: " << ev.option << '\n';
+					analyzer.setup(ev.name, ev.option);
 				});
 
 				while (true) chn_worker.wait();
@@ -90,9 +93,9 @@ namespace vimlight
 			return std::move(cmds);
 		}
 
-		void name(filename_type f)
+		void setup(filename_type f, option_type o)
 		{
-			chn_worker.post(event_name{std::move(f)});
+			chn_worker.post(event_setup{std::move(f), std::move(o)});
 		}
 	}
 }

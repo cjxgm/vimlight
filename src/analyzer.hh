@@ -9,13 +9,14 @@ namespace vimlight
 	{
 		using source_type = clang::translation_unit::source_type;
 		using filename_type = clang::translation_unit::filename_type;
+		using option_type = clang::translation_unit::option_type;
 		using group_type = highlight::group;
 		using list_type = highlight::list;
 
 		analyzer() : index(), tu(index) {}
 
 		list_type parse(source_type const& src, group_type const& group);
-		void name(filename_type const& file) { tu.name(file); }
+		void setup(filename_type const& file, option_type opt) { tu.setup(file, opt); }
 
 	private:
 		clang::index index;

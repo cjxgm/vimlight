@@ -17,21 +17,22 @@ namespace clang
 		using super_type = internal::guard<c::translation_unit::type>;
 		using source_type = unsaved_file::source_type;
 		using filename_type = unsaved_file::name_type;
+		using option_type = filename_type;
 		using index_type = clang::index;
 		using diagnostics_type = std::vector<clang::diagnostic>;
 
 		translation_unit(index_type& index) : index(index)
 		{
 			owned = false;
-			name("source.cc");
+			setup("source.cc", "-std=gnu++14 -Wall -Wextra");
 		}
 
 		~translation_unit() override { if (owned) c::translation_unit::dispose(get()); }
 
-		void name(filename_type const& f)
+		void setup(filename_type const& f, option_type const& o)
 		{
 			clang::unsaved_file uf(f, "");
-			char const* argv[] = { "-std=gnu++1y", "-Wall", "-Wextra" };
+			char const* argv[] = { "-std=gnu++14", "-Wall", "-Wextra" };
 			constexpr auto argc = sizeof(argv)/sizeof(*argv);
 
 			if (owned) c::translation_unit::dispose(get());
