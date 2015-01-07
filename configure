@@ -7,7 +7,7 @@
 
 
 my $CC = "clang++";
-my $CCFLAGS = "-std=gnu++11 -march=native -O3 -Wall -Wextra -fPIC";
+my $CCFLAGS = "-std=gnu++14 -march=native -O3 -Wall -Wextra -fPIC";
 my $LDFLAGS = "-pthread -lclang -shared";
 my $name = "vimlight";
 my $dest = "./$name.so";

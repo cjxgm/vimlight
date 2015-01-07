@@ -6,6 +6,7 @@
 #include "index.hh"
 #include "cursor.hh"
 #include "diagnostic.hh"
+#include "option_parser.hh"
 #include <vector>
 #include <utility>
 
@@ -24,17 +25,17 @@ namespace clang
 		translation_unit(index_type& index)
 			: super_type(c::translation_unit::dispose), index(index)
 		{
+			// use c++14 as default
 			setup("source.cc", "-std=gnu++14 -Wall -Wextra");
 		}
 
 		void setup(filename_type const& f, option_type const& o)
 		{
 			clang::unsaved_file uf(f, "");
-			char const* argv[] = { "-std=gnu++14", "-Wall", "-Wextra" };
-			constexpr auto argc = sizeof(argv)/sizeof(*argv);
+			option_parser op{o};
 
 			set(c::translation_unit::parse(
-					index, f.c_str(), argv, argc, uf, 1,
+					index, f.c_str(), op.argv(), op.argc(), uf, 1,
 					c::translation_unit::flag::none));
 
 			file = f;
