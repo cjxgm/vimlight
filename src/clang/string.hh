@@ -1,13 +1,13 @@
 #pragma once
 #include "c.hh"
-#include "internal.hh"
+#include "resource.hh"
 #include <string>
 
 namespace clang
 {
-	struct string : public internal::guard<c::string::type>
+	struct string : public resource::unique<c::string::type>
 	{
-		using super_type = internal::guard<c::string::type>;
+		using super_type = unique;
 		using cstring_type = char const*;
 		using  string_type = std::string;
 

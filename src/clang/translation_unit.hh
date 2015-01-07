@@ -1,7 +1,7 @@
 #pragma once
 #include "../log.hh"
 #include "c.hh"
-#include "internal.hh"
+#include "resource.hh"
 #include "unsaved_file.hh"
 #include "index.hh"
 #include "cursor.hh"
@@ -11,10 +11,10 @@
 
 namespace clang
 {
-	struct translation_unit : public internal::guard<c::translation_unit::type>
+	struct translation_unit : public resource::unique<c::translation_unit::type>
 	{
 		using self_type = translation_unit;
-		using super_type = internal::guard<c::translation_unit::type>;
+		using super_type = unique;
 		using source_type = unsaved_file::source_type;
 		using filename_type = unsaved_file::name_type;
 		using option_type = filename_type;

@@ -1,6 +1,6 @@
 #pragma once
 #include "c.hh"
-#include "internal.hh"
+#include "resource.hh"
 #include "range.hh"
 #include "location.hh"
 #include "string.hh"
@@ -9,10 +9,10 @@
 
 namespace clang
 {
-	struct cursor : public internal::bin<c::cursor::type>
+	struct cursor : public resource::bin<c::cursor::type>
 	{
 		using self_type = cursor;
-		using super_type = internal::bin<c::cursor::type>;
+		using super_type = bin;
 		using name_type = std::string;
 		using identifier_type = std::string;
 		using visitor_type = std::function<bool(self_type const&)>;
@@ -20,9 +20,9 @@ namespace clang
 
 
 
-		struct kind : public internal::bin<c::cursor::kind::type>
+		struct kind : public resource::bin<c::cursor::kind::type>
 		{
-			using super_type = internal::bin<c::cursor::kind::type>;
+			using super_type = bin;
 
 			kind(value_type value) : super_type(value) {}
 
@@ -66,10 +66,9 @@ namespace clang
 		using raw_cursor_type = c::cursor::type;
 		static visit_result_type raw_visitor(
 				raw_cursor_type cursor,
-				raw_cursor_type parent,
+				raw_cursor_type /*parent*/,
 				void* data)
 		{
-			#pragma unused(parent)
 			clang::cursor cu(cursor);
 			auto visitor = reinterpret_cast<visitor_type const*>(data);
 			visitor_type const& visit = *visitor;

@@ -4,7 +4,7 @@
 
 namespace clang
 {
-	namespace internal
+	namespace resource
 	{
 		// a pod container
 		// should not be used for polymorphism
@@ -26,28 +26,29 @@ namespace clang
 			value_type value;
 		};
 
-		// an auto-delete pod container
+		// an auto-delete pod container like unique_ptr for pointers
 		// should not be used for polymorphism
 		//
+		//invariant:
 		// if (owned) assert(deleter);
 		template <class VALUE>
-		struct guard : bin<VALUE>
+		struct unique : bin<VALUE>
 		{
 			using value_type = VALUE;
-			using self = guard;
+			using self = unique;
 			using super = bin<value_type>;
 			using deleter_type = std::function<void(value_type)>;
 
-			guard(deleter_type d) : owned(false), deleter(d) {}
-			guard(value_type value, deleter_type d)
+			unique(deleter_type d) : owned(false), deleter(d) {}
+			unique(value_type value, deleter_type d)
 				: super(value), owned(true), deleter(d) {}
-			~guard() { delete_if_owned(); }
+			~unique() { delete_if_owned(); }
 
 			// no copy
-			guard(self const&) = delete;
+			unique(self const&) = delete;
 			self& operator=(self const&) = delete;
 
-			guard(self&& other)
+			unique(self&& other)
 				:	super(other.get()),
 					owned(other.owned),
 					deleter(std::move(other.deleter))
