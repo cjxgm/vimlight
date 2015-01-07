@@ -14,9 +14,8 @@ namespace clang
 		using super_type = internal::guard<c::diagnostic::type>;
 		using text_type = std::string;
 
-		diagnostic(value_type value) : super_type(value) {}
-		diagnostic(self_type&& value) : super_type(std::move(value)) {}
-		~diagnostic() override { if (owned) c::diagnostic::dispose(get()); }
+		diagnostic(value_type value)
+			: super_type(value, c::diagnostic::dispose) {}
 
 		location location() { return c::diagnostic::get_location(get()); }
 		text_type text()

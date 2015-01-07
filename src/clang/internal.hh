@@ -1,57 +1,81 @@
 #pragma once
+#include <utility>
+#include <functional>
 
 namespace clang
 {
 	namespace internal
 	{
-		template <class Value>
+		// a pod container
+		// should not be used for polymorphism
+		template <class VALUE>
 		struct bin
 		{
-			using self_type = bin;
-			using value_type = Value;
+			using self = bin;
+			using value_type = VALUE;
 
 			bin() = default;
 			bin(value_type value) : value(value) {}
 
-			virtual ~bin() = default;
-
 			value_type const& get() const { return value; }
 			operator value_type() const { return get(); }
 
-		protected:
 			void set(value_type const& v) { value = v; }
 
 		private:
 			value_type value;
 		};
 
-		template <class Value>
-		struct guard : public bin<Value>
+		// an auto-delete pod container
+		// should not be used for polymorphism
+		//
+		// if (owned) assert(deleter);
+		template <class VALUE>
+		struct guard : bin<VALUE>
 		{
-			using self_type = guard;
-			using super_type = bin<Value>;
-			using value_type = typename super_type::value_type;
+			using value_type = VALUE;
+			using self = guard;
+			using super = bin<value_type>;
+			using deleter_type = std::function<void(value_type)>;
 
-			guard() : owned(false) {}
-			guard(value_type value) : super_type(value), owned(true) {}
+			guard(deleter_type d) : owned(false), deleter(d) {}
+			guard(value_type value, deleter_type d)
+				: super(value), owned(true), deleter(d) {}
+			~guard() { delete_if_owned(); }
 
-			guard(self_type const&) = delete;
-			self_type& operator=(self_type const&) = delete;
+			// no copy
+			guard(self const&) = delete;
+			self& operator=(self const&) = delete;
 
-			guard(self_type&& other) : super_type(other.get()), owned(true)
+			guard(self&& other)
+				:	super(other.get()),
+					owned(other.owned),
+					deleter(std::move(other.deleter))
 			{
 				other.owned = false;
 			}
-			self_type& operator=(self_type&& other)
+			self& operator=(self&& other)
 			{
-				set(other.get());
-				owned = true;
+				delete_if_owned();
+				super::set(other.get());
+				deleter = std::move(other.deleter);
+				owned = other.owned;
 				other.owned = false;
 				return *this;
 			}
 
-		protected:
+			void set(value_type const& v)
+			{
+				delete_if_owned();
+				owned = true;
+				super::set(v);
+			}
+
+		private:
 			bool owned;
+			deleter_type deleter;
+
+			void delete_if_owned() { if (owned) deleter(super::get()); }
 		};
 	}
 }

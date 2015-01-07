@@ -11,8 +11,7 @@ namespace clang
 		using cstring_type = char const*;
 		using  string_type = std::string;
 
-		string(value_type value) : super_type(value) {}
-		~string() override { if (owned) c::string::dispose(get()); }
+		string(value_type value) : super_type(value, c::string::dispose) {}
 
 		operator cstring_type() const { return c::string::cstr(get()); }
 		operator  string_type() const { return operator cstring_type(); }

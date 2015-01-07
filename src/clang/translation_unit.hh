@@ -21,22 +21,17 @@ namespace clang
 		using index_type = clang::index;
 		using diagnostics_type = std::vector<clang::diagnostic>;
 
-		translation_unit(index_type& index) : index(index)
+		translation_unit(index_type& index)
+			: super_type(c::translation_unit::dispose), index(index)
 		{
-			owned = false;
 			setup("source.cc", "-std=gnu++14 -Wall -Wextra");
 		}
-
-		~translation_unit() override { if (owned) c::translation_unit::dispose(get()); }
 
 		void setup(filename_type const& f, option_type const& o)
 		{
 			clang::unsaved_file uf(f, "");
 			char const* argv[] = { "-std=gnu++14", "-Wall", "-Wextra" };
 			constexpr auto argc = sizeof(argv)/sizeof(*argv);
-
-			if (owned) c::translation_unit::dispose(get());
-			else owned = true;
 
 			set(c::translation_unit::parse(
 					index, f.c_str(), argv, argc, uf, 1,

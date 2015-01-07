@@ -8,8 +8,7 @@ namespace clang
 	{
 		using super_type = internal::guard<c::index::type>;
 
-		index() : super_type(c::index::create(0, 0)) {}
-		~index() override { if (owned) c::index::dispose(get()); }
+		index() : super_type(c::index::create(0, 0), c::index::dispose) {}
 	};
 }
 
