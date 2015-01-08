@@ -25,8 +25,7 @@ namespace clang
 		translation_unit(index_type& index)
 			: super_type(c::translation_unit::dispose), index(index)
 		{
-			// use c++14 as default
-			setup("source.cc", "-std=gnu++14 -Wall -Wextra");
+			setup("", "");
 		}
 
 		void setup(filename_type const& f, option_type const& o)

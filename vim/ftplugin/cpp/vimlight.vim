@@ -4,7 +4,7 @@
 " Copyright: (C) 2014 eXerigumo Clanjor(哆啦比猫/兰威举) <cjxgm@126.com>
 "   License: The MIT Licence with modification. see LICENSE for details.
 
-" run only once
+" run only once per buffer
 if exists("b:did_vimlight")
 	finish
 endif

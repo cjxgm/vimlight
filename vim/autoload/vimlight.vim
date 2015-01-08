@@ -13,6 +13,7 @@ let g:loaded_vimlight = 1
 lua <<END
 	local root = vim.eval[[expand("<sfile>:h:h")]]
 	package.cpath = ("%s;%s/lib/?.so"):format(package.cpath, root)
+
 	vimlight = {}	-- global variable intentionally
 	local vl = vimlight
 	vl.engine = require 'vimlight_engine'
@@ -20,6 +21,11 @@ lua <<END
 	vl.engine.init(root .. "/etc/hlgroup.vimlight")
 	vl.done = true
 	vl.modified = true
+
+	vl.options = {
+		c = "-std=gnu11 -Wall -Wextra",
+		cpp = "-std=gnu++14 -Wall -Wextra",
+	}
 
 	vl.apply = function(this)
 		if this.done then return end
@@ -56,8 +62,10 @@ lua <<END
 
 	vl.rename = function(this)
 		local file = vim.eval("expand('%')")
-		if file == "" then file = "source.cc" end
-		this.engine.setup(file, "-std=gnu++14 -Wall -Wextra")
+		local ft   = vim.eval("&ft")
+		if file == "" then file = "source." .. ft end
+		local opt = this.options[ft] or ""
+		this.engine.setup(file, opt)
 	end
 
 	vl.leave = function(this)
@@ -66,7 +74,7 @@ lua <<END
 END
 
 function vimlight#update()
-	if &ft != "cpp"
+	if &ft != "cpp" && &ft != "c"
 		return
 	endif
 lua <<END
@@ -83,7 +91,7 @@ function vimlight#modify()
 endf
 
 function vimlight#rename()
-	if &ft != "cpp"
+	if &ft != "cpp" && &ft != "c"
 		return
 	endif
 
