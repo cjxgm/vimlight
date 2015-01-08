@@ -55,6 +55,16 @@ namespace vimlight
 				return 0;
 			};
 
+			// !!! this can only be your last call into the library !!!
+			// this is only for proper shutdown
+			lib["exit"] = [](lua::state& s) {
+				if (!inited) s.error("not initialized");
+				worker::stop();
+				// inited will remain true
+				// you should never ever call anything afterwards
+				return 0;
+			};
+
 			s.push(lib);
 			return 1;
 		}

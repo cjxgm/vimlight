@@ -34,8 +34,12 @@ namespace vimlight
 		// returns vim commands
 		commands_type get();
 
-		// rename the current editing source file
+		// rename the current editing source file, and/or
+		// change the current command line options
 		void setup(filename_type f, option_type o);
+
+		// signal and wait the worker thread to exit
+		void stop();
 	}
 }
 

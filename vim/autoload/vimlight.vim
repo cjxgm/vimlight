@@ -59,6 +59,10 @@ lua <<END
 		if file == "" then file = "source.cc" end
 		this.engine.setup(file, "-std=gnu++14 -Wall -Wextra")
 	end
+
+	vl.leave = function(this)
+		this.engine.exit()
+	end
 END
 
 function vimlight#update()
@@ -97,4 +101,10 @@ endf
 function vimlight#finish()
 	lua vimlight:finish()
 endf
+
+function vimlight#leave()
+	lua vimlight:leave()
+endf
+
+au VimLeave	* call vimlight#leave()
 
