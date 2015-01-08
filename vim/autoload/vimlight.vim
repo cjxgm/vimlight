@@ -22,7 +22,7 @@ lua <<END
 	vl.done = true
 	vl.modified = true
 
-	vl.options = {
+	vl.default_options = {
 		c = "-std=gnu11 -Wall -Wextra",
 		cpp = "-std=gnu++14 -Wall -Wextra",
 	}
@@ -62,10 +62,21 @@ lua <<END
 
 	vl.rename = function(this)
 		local file = vim.eval("expand('%')")
-		local ft   = vim.eval("&ft")
+		local ft = vim.eval("&ft")
 		if file == "" then file = "source." .. ft end
-		local opt = this.options[ft] or ""
-		this.engine.setup(file, opt)
+		this.file = file
+	end
+
+	vl.reoption = function(this)
+		local opt = vim.eval([[ exists("b:vimlight_option") ? b:vimlight_option : "" ]])
+		if opt == "" then opt = nil end
+		local ft = vim.eval("&ft")
+		local default = this.default_options[ft] or ""
+		this.option = opt or default or ""
+	end
+
+	vl.setup = function(this)
+		this.engine.setup(this.file, this.option)
 	end
 
 	vl.leave = function(this)
@@ -90,7 +101,7 @@ function vimlight#modify()
 	call vimlight#update()
 endf
 
-function vimlight#rename()
+function vimlight#enter()
 	if &ft != "cpp" && &ft != "c"
 		return
 	endif
@@ -103,6 +114,8 @@ function vimlight#rename()
 	hi def link cppNamespaceSep Special
 
 	lua vimlight:rename()
+	lua vimlight:reoption()
+	lua vimlight:setup()
 	call vimlight#modify()
 endf
 
@@ -112,6 +125,23 @@ endf
 
 function vimlight#leave()
 	lua vimlight:leave()
+endf
+
+
+" user function
+function vimlight#option(opt)
+	let b:vimlight_option = a:opt
+	lua vimlight:reoption()
+	lua vimlight:setup()
+	call vimlight#modify()
+endf
+
+" user function
+function vimlight#default_option()
+	unlet! b:vimlight_option
+	lua vimlight:reoption()
+	lua vimlight:setup()
+	call vimlight#modify()
 endf
 
 au VimLeave	* call vimlight#leave()

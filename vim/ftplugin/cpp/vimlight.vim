@@ -10,7 +10,7 @@ if exists("b:did_vimlight")
 endif
 let b:did_vimlight = 1
 
-au BufEnter		* call vimlight#rename()
+au BufEnter		* call vimlight#enter()
 au BufLeave		* call vimlight#finish()
 au TextChanged	* call vimlight#modify()
 au TextChangedI	* call vimlight#modify()
