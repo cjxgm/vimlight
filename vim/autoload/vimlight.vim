@@ -13,10 +13,11 @@ let g:loaded_vimlight = 1
 lua <<END
 	local root = vim.eval[[expand("<sfile>:h:h")]]
 	package.cpath = ("%s;%s/lib/?.so"):format(package.cpath, root)
-	vimlight = require 'vimlight'	-- global variable intentionally
+	vimlight = {}	-- global variable intentionally
 	local vl = vimlight
+	vl.engine = require 'vimlight_engine'
 
-	vl.init(root .. "/etc/hlgroup.vimlight")
+	vl.engine.init(root .. "/etc/hlgroup.vimlight")
 	vl.done = true
 	vl.modified = true
 
@@ -24,7 +25,7 @@ lua <<END
 		if this.done then return end
 		local result
 		while true do
-			result = this.get()
+			result = this.engine.get()
 			if result == nil then break end
 			for _,cmd in ipairs(result) do
 				vim.command(cmd)
@@ -45,7 +46,7 @@ lua <<END
 			this.done = false
 			this.modified = false
 			local src = vim.eval("join(getline(1, '$'), '\n')")
-			this.request(src)
+			this.engine.request(src)
 		end
 	end
 
@@ -56,7 +57,7 @@ lua <<END
 	vl.rename = function(this)
 		local file = vim.eval("expand('%')")
 		if file == "" then file = "source.cc" end
-		this.setup(file, "-std=gnu++14 -Wall -Wextra")
+		this.engine.setup(file, "-std=gnu++14 -Wall -Wextra")
 	end
 END
 
