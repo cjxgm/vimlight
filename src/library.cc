@@ -44,12 +44,24 @@ namespace vimlight
 				return 1;
 			};
 
-			lib["name"] = [](lua::state& s) {
+			lib["setup"] = [](lua::state& s) {
 				if (!inited) s.error("not initialized");
 
 				worker::filename_type f;
+				worker::option_type o;
 				s.get(f, 1);
-				worker::name(std::move(f));
+				s.get(o, 2);
+				worker::setup(std::move(f), std::move(o));
+				return 0;
+			};
+
+			// !!! this can only be your last call into the library !!!
+			// this is only for proper shutdown
+			lib["exit"] = [](lua::state& s) {
+				if (!inited) s.error("not initialized");
+				worker::stop();
+				// inited will remain true
+				// you should never ever call anything afterwards
 				return 0;
 			};
 

@@ -1,44 +1,40 @@
 #pragma once
 #include "../log.hh"
 #include "c.hh"
-#include "internal.hh"
+#include "resource.hh"
 #include "unsaved_file.hh"
 #include "index.hh"
 #include "cursor.hh"
 #include "diagnostic.hh"
+#include "option_parser.hh"
 #include <vector>
 #include <utility>
 
 namespace clang
 {
-	struct translation_unit : public internal::guard<c::translation_unit::type>
+	struct translation_unit : public resource::unique<c::translation_unit::type>
 	{
 		using self_type = translation_unit;
-		using super_type = internal::guard<c::translation_unit::type>;
+		using super_type = unique;
 		using source_type = unsaved_file::source_type;
 		using filename_type = unsaved_file::name_type;
+		using option_type = filename_type;
 		using index_type = clang::index;
 		using diagnostics_type = std::vector<clang::diagnostic>;
 
-		translation_unit(index_type& index) : index(index)
+		translation_unit(index_type& index)
+			: super_type(c::translation_unit::dispose), index(index)
 		{
-			owned = false;
-			name("source.cc");
+			setup("", "");
 		}
 
-		~translation_unit() override { if (owned) c::translation_unit::dispose(get()); }
-
-		void name(filename_type const& f)
+		void setup(filename_type const& f, option_type const& o)
 		{
 			clang::unsaved_file uf(f, "");
-			char const* argv[] = { "-std=gnu++1y", "-Wall", "-Wextra" };
-			constexpr auto argc = sizeof(argv)/sizeof(*argv);
-
-			if (owned) c::translation_unit::dispose(get());
-			else owned = true;
+			option_parser op{o};
 
 			set(c::translation_unit::parse(
-					index, f.c_str(), argv, argc, uf, 1,
+					index, f.c_str(), op.argv(), op.argc(), uf, 1,
 					c::translation_unit::flag::none));
 
 			file = f;

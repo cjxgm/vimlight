@@ -11,6 +11,7 @@ namespace vimlight
 	{
 		static channel chn_worker;
 		static channel chn_main;
+		static std::thread th;
 
 		struct event_done : public channel::event {};
 		struct event_request : public channel::event
@@ -23,25 +24,28 @@ namespace vimlight
 			commands_type cmds;
 			event_result(commands_type cmds) : cmds{std::move(cmds)} {}
 		};
-		struct event_name : public channel::event
+		struct event_setup : public channel::event
 		{
 			filename_type name;
-			event_name(filename_type name) : name{std::move(name)} {}
+			option_type option;
+			event_setup(filename_type name, option_type option)
+				: name{std::move(name)}, option{std::move(option)} {}
 		};
+		struct event_stop : public channel::event {};
 
 
 		void start(filename_type const& hlgroup)
 		{
 			auto rm_done = chn_main.listen<event_done>([] {});
 
-			std::thread th([&hlgroup] {
+			th = std::thread{[&hlgroup] {
 				vimlight::vim vim;
 				vimlight::analyzer analyzer;
 				highlight::group group(hlgroup);
 				highlight::collector collector;
 				chn_main.post(event_done{});
 
-				chn_worker.listen<event_request>([&](event_request ev) {
+				chn_worker.listen<event_request>([&](auto ev) {
 					log << "(worker) parse request\n";
 					auto result = analyzer.parse(ev.src, group);
 					collector.update(result, vim);
@@ -49,14 +53,21 @@ namespace vimlight
 					chn_main.post(event_result{std::move(vim.get())});
 				});
 
-				chn_worker.listen<event_name>([&](event_name ev) {
-					log << "(worker) name: " << ev.name << '\n';
-					analyzer.name(ev.name);
+				chn_worker.listen<event_setup>([&](auto ev) {
+					log << "(worker) setup request\n";
+					log << "\t" << ev.name << '\n';
+					log << "\t" << ev.option << '\n';
+					analyzer.setup(ev.name, ev.option);
 				});
 
-				while (true) chn_worker.wait();
-			});
-			th.detach();
+				bool cont = true;
+				chn_worker.listen<event_stop>([&](auto) {
+					log << "(worker) stop request\n";
+					cont = false;
+				});
+
+				while (cont) chn_worker.wait();
+			}};
 
 			chn_main.wait();
 			rm_done();
@@ -90,9 +101,16 @@ namespace vimlight
 			return std::move(cmds);
 		}
 
-		void name(filename_type f)
+		void setup(filename_type f, option_type o)
 		{
-			chn_worker.post(event_name{std::move(f)});
+			chn_worker.post(event_setup{std::move(f), std::move(o)});
+		}
+
+		void stop()
+		{
+			chn_worker.post(event_stop{});
+			if (th.joinable()) th.join();
+			log << "shutdown.\n\n";
 		}
 	}
 }

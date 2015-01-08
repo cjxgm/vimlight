@@ -1,4 +1,4 @@
-# vimlight: clang syntax highlighter for vim
+# vimlight: clang semantic highlighter for vim
 work in progress...
 
 ## license

@@ -1,14 +1,14 @@
 #pragma once
 #include "c.hh"
-#include "internal.hh"
+#include "resource.hh"
 #include "location.hh"
 #include <utility>
 
 namespace clang
 {
-	struct range : public internal::bin<c::range::type>
+	struct range : public resource::bin<c::range::type>
 	{
-		using super_type = internal::bin<c::range::type>;
+		using super_type = bin;
 
 		range(value_type value) : super_type(value) {}
 

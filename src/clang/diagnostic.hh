@@ -1,6 +1,6 @@
 #pragma once
 #include "c.hh"
-#include "internal.hh"
+#include "resource.hh"
 #include "location.hh"
 #include "string.hh"
 #include <utility>
@@ -8,15 +8,14 @@
 
 namespace clang
 {
-	struct diagnostic : public internal::guard<c::diagnostic::type>
+	struct diagnostic : public resource::unique<c::diagnostic::type>
 	{
 		using self_type = diagnostic;
-		using super_type = internal::guard<c::diagnostic::type>;
+		using super_type = unique;
 		using text_type = std::string;
 
-		diagnostic(value_type value) : super_type(value) {}
-		diagnostic(self_type&& value) : super_type(std::move(value)) {}
-		~diagnostic() override { if (owned) c::diagnostic::dispose(get()); }
+		diagnostic(value_type value)
+			: super_type(value, c::diagnostic::dispose) {}
 
 		location location() { return c::diagnostic::get_location(get()); }
 		text_type text()

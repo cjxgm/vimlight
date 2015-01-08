@@ -2,6 +2,7 @@
 // management and communication with/to/from the worker thread
 // the worker thread parses the requested source code and
 // produces vim highlighting commands.
+#include <string>
 #include "analyzer.hh"
 #include "vim.hh"
 #include "highlight/type.hh"
@@ -13,6 +14,7 @@ namespace vimlight
 		using   source_type =  analyzer::  source_type;
 		using commands_type =       vim::commands_type;
 		using filename_type = highlight::filename_type;
+		using   option_type =  analyzer::option_type;
 
 		// should be called once and only once before calling any
 		// other functions in worker namespace.
@@ -32,8 +34,12 @@ namespace vimlight
 		// returns vim commands
 		commands_type get();
 
-		// rename the current editing source file
-		void name(filename_type f);
+		// rename the current editing source file, and/or
+		// change the current command line options
+		void setup(filename_type f, option_type o);
+
+		// signal and wait the worker thread to exit
+		void stop();
 	}
 }
 

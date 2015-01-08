@@ -7,10 +7,10 @@
 
 
 my $CC = "clang++";
-my $CCFLAGS = "-std=gnu++11 -march=native -O3 -Wall -Wextra -fPIC";
+my $CCFLAGS = "-std=gnu++14 -march=native -O3 -Wall -Wextra -fPIC";
 my $LDFLAGS = "-pthread -lclang -shared";
 my $name = "vimlight";
-my $dest = "./$name.so";
+my $dest = "./${name}_engine.so";
 my $test = "exit 1";
 my @libs = qw(lua);
 
@@ -93,7 +93,7 @@ bundle: all
 	rm -rf bundle/
 	cp -r vim/ bundle/
 	mkdir -p bundle/lib/
-	cp $dest bundle/lib/$name.so
+	cp $dest bundle/lib/$dest
 	cp README.md bundle/
 	cp LICENSE* bundle/
 install: bundle uninstall

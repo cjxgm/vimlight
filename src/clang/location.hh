@@ -1,15 +1,15 @@
 #pragma once
 #include "c.hh"
-#include "internal.hh"
+#include "resource.hh"
 #include "string.hh"
 #include <string>
 
 namespace clang
 {
-	struct location : public internal::bin<c::location::type>
+	struct location : public resource::bin<c::location::type>
 	{
 		using self_type = location;
-		using super_type = internal::bin<c::location::type>;
+		using super_type = bin;
 		using name_type = std::string;
 
 		struct position
