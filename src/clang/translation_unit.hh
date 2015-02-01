@@ -25,7 +25,7 @@ namespace clang
 		translation_unit(index_type& index)
 			: super_type(c::translation_unit::dispose), index(index)
 		{
-			setup("", "");
+			setup("source.cc", "");
 		}
 
 		void setup(filename_type const& f, option_type const& o)
