@@ -17,6 +17,10 @@ namespace vimlight
 		ss	<< "syn match vimlight_" << rec.name
 			<< " +\\%" << rec.y1 << "l\\%" << rec.x1 << "c"
 			<< ".*\\%" << rec.y2 << "l\\%" << rec.x2 << "c+";
+		// TODO
+//		ss	<< "call matchaddpos(\"vimlight_" << rec.name
+//			<< "\", [[" << rec.y1 << ", " << rec.x1
+//			<< ", " << rec.x2-rec.x1 << "]])";
 		push(ss.str());
 	}
 
