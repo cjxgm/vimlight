@@ -13,25 +13,25 @@ namespace vimlight
 		static channel chn_main;
 		static std::thread th;
 
-		struct event_done : public channel::event {};
+		struct event_done : public channel::event { event_done() : event{3} {} };
 		struct event_request : public channel::event
 		{
 			source_type src;
-			event_request(source_type src) : src{std::move(src)} {}
+			event_request(source_type src) : event{2}, src{std::move(src)} {}
 		};
 		struct event_result : public channel::event
 		{
 			commands_type cmds;
-			event_result(commands_type cmds) : cmds{std::move(cmds)} {}
+			event_result(commands_type cmds) : event{1}, cmds{std::move(cmds)} {}
 		};
 		struct event_setup : public channel::event
 		{
 			filename_type name;
 			option_type option;
 			event_setup(filename_type name, option_type option)
-				: name{std::move(name)}, option{std::move(option)} {}
+				: event{3}, name{std::move(name)}, option{std::move(option)} {}
 		};
-		struct event_stop : public channel::event {};
+		struct event_stop : public channel::event { event_stop() : event{4} {} };
 
 
 		void start(filename_type const& hlgroup)
