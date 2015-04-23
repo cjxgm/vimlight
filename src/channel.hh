@@ -1,6 +1,8 @@
 #pragma once
 // an inter-thread multiple-writer single-reader communication channel.
 // this is used to pass events to another thread.
+// this is prioritized, i.e. a higher priority events will erase
+// subsequent lower priority ones.
 #include <functional>
 #include <type_traits>
 #include <utility>
@@ -20,11 +22,18 @@ namespace vimlight
 		struct event
 		{
 			event() = default;
+			event(int p) : priority{p} {}
+
+			// FIXME: are these needed?
 			event(event const&) = default;
 			event(event&&) = default;
 			event& operator=(event const&) = default;
 			event& operator=(event&&) = default;
 			virtual ~event() = default;
+
+		private:
+			int priority{};
+			friend channel;
 		};
 
 		using event_ptr  = std::shared_ptr<event>;
@@ -69,12 +78,14 @@ namespace vimlight
 		}
 
 		template <class Event>
-		void post(Event ev)
+		void post(Event ev={})
 		{
 			static_assert(std::is_base_of<event, Event>(),
 					"Event must be a sub-class of channel::event");
 
 			lock _(m);
+			while (events.size() && events.back()->priority <= ev.priority)
+				events.pop_back();
 			events.push_back(std::make_shared<Event>(std::move(ev)));
 			cv.notify_one();
 		}

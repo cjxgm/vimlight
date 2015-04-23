@@ -81,6 +81,7 @@ lua <<END
 
 	vl.leave = function(this)
 		this.engine.exit()
+		this.engine = {}
 	end
 END
 
