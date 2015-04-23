@@ -1,0 +1,7 @@
+#define CONST_HELPER_IMPL_KP(X...)	X					// kill parenthesis
+#define CONST_HELPER_IMPL(BEFORE, AFTER...) \
+	CONST_HELPER_IMPL_KP BEFORE         AFTER \
+	CONST_HELPER_IMPL_KP BEFORE  const  AFTER
+#define CONST_HELPER(CODE...)	CONST_HELPER_IMPL((CODE)
+#define CONST	),
+
