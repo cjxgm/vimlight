@@ -23,48 +23,60 @@ namespace vimlight
 		template <class EVENT>
 		void post(EVENT ev={})
 		{
+			event_variant evar;
+			evar.template emplace<EVENT>(std::move(ev));
+
 			lock _(m);
 			while (priority_compare<EVENT::priority()>())
 				events.pop_back();
-			events.emplace_back(std::move(ev));
+			events.emplace_back(std::move(evar));
 			cv.notify_one();
 		}
 
 		template <class EVENT>
-		bool ignore()
+		bool is()
 		{
 			lock _(m);
 			if (!events.size()) return false;
-			if (!events.back().template is<EVENT>()) return false;
-			events.pop_back();
-			return true;
+			return events.front().template is<EVENT>();
+		}
+
+		template <class EVENT>
+		auto get()	// you should be sure there is a event
+		{
+			event_variant evar;
+			{
+				lock _(m);
+				evar = std::move(events.front());
+				events.erase(events.begin());
+			}
+			return evar.template strict_get<EVENT>();
 		}
 
 		template <class EVENT>
 		auto wait()
 		{
-			event_variant ev;
+			event_variant evar;
 			{
 				lock _(m);
 				cv.wait(_, [this] { return events.size(); });
-				ev = std::move(events.back());
-				events.pop_back();
+				evar = std::move(events.front());
+				events.erase(events.begin());
 			}
-			if (ev.template is<EVENT>()) return ev;
-			throw ev;
+			return evar.template strict_get<EVENT>();
 		}
 
 		template <class F>
-		void listen(F const& f={})
+		decltype(auto) listen(F const& f={})
 		{
-			event_variant ev;
+			event_variant evar;
 			{
 				lock _(m);
 				cv.wait(_, [this] { return events.size(); });
-				ev = std::move(events.back());
-				events.pop_back();
+				evar = std::move(events.front());
+				events.erase(events.begin());
 			}
-			ev.visit(f);
+			return evar.visit(f);
 		}
 
 	private:
@@ -73,7 +85,7 @@ namespace vimlight
 		using lock  = std::unique_lock<mutex>;
 
 		using event_variant = meta::variant<EVENTS...>;
-		using event_list = std::vector<event_variant>;
+		using event_list = std::vector<event_variant>;	// FIXME: vector or deque, that is a question
 
 		condv cv;
 		mutex m;

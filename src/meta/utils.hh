@@ -69,7 +69,7 @@ namespace meta
 			template <index_type I, class U, class ...TS>
 			constexpr auto index_of<I, U, U, TS...> = I;
 
-			template <index_type I, class ...TS>
+			template <index_type I, class U, class ...TS>
 			constexpr auto check()
 			{
 				static_assert(I < sizeof...(TS), "not one of the specified types");
@@ -77,7 +77,7 @@ namespace meta
 			};
 
 			template <class U, class ...TS>
-			constexpr auto checked = check<index_of<0, U, TS...>, TS...>();
+			constexpr auto checked = check<index_of<0, U, TS...>, U, TS...>();
 		}
 
 		template <class U, class ...TS>

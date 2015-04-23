@@ -11,9 +11,7 @@ namespace meta
 	template <class ...MEMBERS>
 	struct variant
 	{
-		template <class T>
-		explicit variant(T&& x) : ti{index_of<T>}, au{std::forward<T>(x)} {}
-		variant() : variant(nil{}) {}
+		variant() { construct<nil>(); }
 		variant(variant const& x) { x.visit<copy_constructor>({*this}); }
 		variant(variant     && x) { x.visit<move_constructor>({*this}); }
 		~variant() { destruct(); }
@@ -47,13 +45,8 @@ namespace meta
 			}
 		);
 
-		template <class T>
-		auto& operator = (T&& x)
-		{
-			if (is<T>()) as<T>() = std::forward<T>(x);
-			else emplace<T>(std::forward<T>(x));
-			return *this;
-		}
+		auto& operator = (variant const& x) { destruct(); x.visit<copy_constructor>({*this}); return *this; }
+		auto& operator = (variant     && x) { destruct(); x.visit<move_constructor>({*this}); return *this; }
 
 	private:
 		using type_index = utils::index_type;
