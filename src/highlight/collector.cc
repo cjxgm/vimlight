@@ -6,17 +6,15 @@ namespace vimlight
 	{
 		void collector::update(highlight_list const& hl, vim_type& vim)
 		{
-			for (auto& rec: hl)
-				if (!names[rec.name]) {
-					vim.link(rec.name);
-					names[rec.name] = true;
-				}
+			for (auto i = 0u; i < highlights.size(); i++)
+				vim.del(i);
 
-			for (auto& name: names)
-				vim.clear(name.first);
-
-			for (auto& rec: hl)
-				vim.add(rec);
+			highlights.clear();		// FIXME
+			auto i = 0u;
+			for (auto& rec: hl) {
+				vim.add(i++, rec);
+				highlights.push_back(rec);
+			}
 		}
 	}
 }

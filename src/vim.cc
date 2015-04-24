@@ -1,4 +1,5 @@
 #include "vim.hh"
+#include "log.hh"
 #include <sstream>
 
 
@@ -8,19 +9,27 @@ namespace vimlight
 {
 	void vim::push(command_type const& cmd)
 	{
+		log << "vim command: "<< cmd << "\n";
 		commands.push_back(cmd);
 	}
 
-	void vim::add(hlrecord_type const& rec)
+	void vim::add(int i, hlrecord_type const& rec)
 	{
 		std::ostringstream ss;
-		ss	<< "syn match vimlight_" << rec.name
-			<< " +\\%" << rec.y1 << "l\\%" << rec.x1 << "c"
-			<< ".*\\%" << rec.y2 << "l\\%" << rec.x2 << "c+";
+		ss	<< "add(" << i << ", \"" << rec.name << "\", "
+			<< rec.y1 << ", " << rec.x1 << ", "
+			<< rec.x2-rec.x1 << ")";
 		// TODO
 //		ss	<< "call matchaddpos(\"vimlight_" << rec.name
 //			<< "\", [[" << rec.y1 << ", " << rec.x1
 //			<< ", " << rec.x2-rec.x1 << "]])";
+		push(ss.str());
+	}
+
+	void vim::del(int i)
+	{
+		std::ostringstream ss;
+		ss	<< "del(" << i << ")";
 		push(ss.str());
 	}
 

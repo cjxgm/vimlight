@@ -23,7 +23,10 @@ namespace vimlight
 
 		// generate a command to add a syntax group
 		// and add it to the commands buffer
-		void add(hlrecord_type const& rec);
+		void add(int i, hlrecord_type const& rec);
+
+		// FIXME: doc
+		void del(int i);
 
 		// get the highlighting commands and clear the commands buffer
 		commands_type get()

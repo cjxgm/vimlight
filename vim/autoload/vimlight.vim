@@ -27,6 +27,19 @@ lua <<END
 		cpp = "-std=gnu++14 -Wall -Wextra",
 	}
 
+	vl.cmd_env = {}
+	local ce = vl.cmd_env
+	ce.last = {}
+	ce.add = function(i, group, y, x, w)
+		local cmd = [==[matchaddpos("%s", [[%d, %d, %d]])]==]
+		ce.last[i] = vim.eval(cmd:format(group, y, x, w))
+	end
+	ce.del = function(i)
+		local cmd = [==[matchdelete(%d)]==]
+		vim.eval(cmd:format(ce.last[i]))
+		ce.last[i] = nil
+	end
+
 	vl.apply = function(this)
 		if this.done then return end
 		local result
@@ -34,7 +47,7 @@ lua <<END
 			result = this.engine.get()
 			if result == nil then break end
 			for _,cmd in ipairs(result) do
-				vim.command(cmd)
+				load(cmd, "vimlight-command", 't', this.cmd_env)()
 			end
 			this.done = true
 		end
