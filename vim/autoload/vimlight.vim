@@ -42,13 +42,10 @@ lua <<END
 
 	vl.apply = function(this)
 		if this.done then return end
-		local result
 		while true do
-			result = this.engine.get()
-			if result == nil then break end
-			for _,cmd in ipairs(result) do
-				load(cmd, "vimlight-command", 't', this.cmd_env)()
-			end
+			local cmds = this.engine.get()
+			if cmds == nil then break end
+			load(cmds, "vimlight-command", 't', this.cmd_env)()
 			this.done = true
 		end
 		return this.done
