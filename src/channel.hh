@@ -24,8 +24,10 @@ namespace vimlight
 		void post(EVENT ev={})
 		{
 			lock _(m);
+			/* FIXME: this may cause problems
 			while (priority_compare<EVENT::priority()>())
 				events.pop_back();
+			*/
 			events.emplace_back(std::move(ev));
 			cv.notify_one();
 		}
