@@ -13,7 +13,7 @@ namespace vimlight
 			using highlight_list = highlight::list;
 			using vim_type = vimlight::vim;
 
-			void update(highlight_list const& hl, vim_type& vim);
+			void update(highlight_list hl, vim_type& vim);
 
 		private:
 			highlight_list highlights;

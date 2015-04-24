@@ -58,7 +58,7 @@ namespace vimlight
 			{
 				log << "(worker) parse request\n";
 				auto result = analyzer.parse(ev.src, group);
-				collector.update(result, vim);
+				collector.update(std::move(result), vim);
 				chn_main.post<events::result>({std::move(vim.get())});
 				return true;
 			}
