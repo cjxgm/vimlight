@@ -10,6 +10,8 @@ namespace meta
 	template <class NIL, class ...MEMBERS>
 	struct aligned_union : non_transferable
 	{
+		using self = aligned_union;
+
 		template <class T>
 		static constexpr auto nil_requirement =
 				std::is_nothrow_constructible<T>::value &&
@@ -28,7 +30,7 @@ namespace meta
 			return utils::max(sizeof(nil), sizeof(std::decay_t<MEMBERS>)...);
 		}
 
-		template <class T>
+		template <class T, class = utils::disable_if_base_of<self, T>>
 		aligned_union(T&& x) { construct<T>(std::forward<T>(x)); }
 		aligned_union() : aligned_union{nil{}} {}
 

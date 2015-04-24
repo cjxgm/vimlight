@@ -69,7 +69,7 @@ namespace meta
 			template <index_type I, class U, class ...TS>
 			constexpr auto index_of<I, U, U, TS...> = I;
 
-			template <index_type I, class U, class ...TS>
+			template <index_type I, class ...TS>
 			constexpr auto check()
 			{
 				static_assert(I < sizeof...(TS), "not one of the specified types");
@@ -77,7 +77,7 @@ namespace meta
 			};
 
 			template <class U, class ...TS>
-			constexpr auto checked = check<index_of<0, U, TS...>, U, TS...>();
+			constexpr auto checked = check<index_of<0, U, TS...>, TS...>();
 		}
 
 		template <class U, class ...TS>
@@ -104,6 +104,22 @@ namespace meta
 
 		template <class U, class T>
 		using const_if = typename const_if_impl::const_if<U, T>::type;
+
+
+
+
+		//------ disable if base of
+		//
+		//	disable_if_base_of<U, T>		=> nothing if U is same of T, or U is the base of T
+		//									=>    void otherwise
+		//
+		template <class U, class T>
+		using disable_if_base_of = std::enable_if_t<
+				!std::is_base_of<
+					std::decay_t<U>,
+					std::decay_t<T>
+				>::value
+		>;
 	}
 }
 

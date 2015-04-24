@@ -23,13 +23,10 @@ namespace vimlight
 		template <class EVENT>
 		void post(EVENT ev={})
 		{
-			event_variant evar;
-			evar.template emplace<EVENT>(std::move(ev));
-
 			lock _(m);
 			while (priority_compare<EVENT::priority()>())
 				events.pop_back();
-			events.emplace_back(std::move(evar));
+			events.emplace_back(std::move(ev));
 			cv.notify_one();
 		}
 
