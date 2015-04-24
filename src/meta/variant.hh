@@ -15,8 +15,8 @@ namespace meta
 		template <class T, class = utils::disable_if_base_of<self, T>>
 		variant(T&& x) : ti{index_of<T>}, au{std::forward<T>(x)} {}
 		variant() : variant(nil{}) {}
-		variant(self const& x) { x.visit<copy_constructor>({*this}); }
-		variant(self     && x) { x.visit<move_constructor>({*this}); }
+		variant(self const& x) { x.visit_with_nil<copy_constructor>({*this}); }
+		variant(self     && x) { x.visit_with_nil<move_constructor>({*this}); }
 		~variant() { destruct(); }
 
 		template <class T, class ...TS>
@@ -91,13 +91,21 @@ namespace meta
 			}
 		);
 
+		CONST_HELPER(
+			template <class F>
+			decltype(auto) visit_with_nil(F const& f={}) CONST
+			{
+				return visit<F, nil, MEMBERS...>(f, ti);
+			}
+		);
+
 
 		struct destructor
 		{
 			template <class T>
 			void operator () (T& x) const { x.~T(); }
 		};
-		void destruct() { visit<destructor>(); }
+		void destruct() { visit_with_nil<destructor>(); }
 
 		template <class T, class ...TS>
 		void construct(TS&&... xs)
