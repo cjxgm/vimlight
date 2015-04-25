@@ -6,6 +6,7 @@
 #include "index.hh"
 #include "cursor.hh"
 #include "diagnostic.hh"
+#include "diagnostic_set.hh"
 #include "option_parser.hh"
 #include <vector>
 #include <utility>
@@ -53,11 +54,17 @@ namespace clang
 
 		diagnostics_type diagnostics() const
 		{
-			diagnostics_type diags;
-			auto size = c::diagnostic::get_count(get());
-			diags.reserve(size);
-			for (decltype(size) i=0; i<size; i++)
-				diags.emplace_back(c::diagnostic::get(get(), i));
+			auto diags = diagnostic_set{c::diagnostic::set::from_translation_unit(get())}.all();
+			while (true) {
+				diagnostics_type ds;
+				for (auto& d: ds)
+					for (auto& c: d.childs())
+						ds.emplace_back(std::move(c));
+				if (!ds.size()) break;
+				for (auto& d: ds)
+					diags.emplace_back(std::move(d));
+			}
+
 			return std::move(diags);
 		}
 

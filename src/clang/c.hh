@@ -122,11 +122,20 @@ namespace clang
 
 		namespace diagnostic
 		{
+			namespace set
+			{
+				FORWARD_TYPE(DiagnosticSet);
+				FORWARD_FUNC(dispose, disposeDiagnosticSet);
+				FORWARD_FUNC(from_translation_unit, getDiagnosticSetFromTU);
+				FORWARD_FUNC(get, getDiagnosticInSet);
+				FORWARD_FUNC(get_count, getNumDiagnosticsInSet);
+			}
 			FORWARD_TYPE(Diagnostic);
 			FORWARD_FUNC(dispose, disposeDiagnostic);
-			FORWARD_FUNC(get, getDiagnostic);
-			FORWARD_FUNC(get_count, getNumDiagnostics);
+			FORWARD_FUNC(get_childs, getChildDiagnostics);
 			FORWARD_FUNC(get_location, getDiagnosticLocation);
+			FORWARD_FUNC(get_range, getDiagnosticRange);
+			FORWARD_FUNC(get_range_count, getDiagnosticNumRanges);
 			FORWARD_FUNC(format, formatDiagnostic);
 		}
 

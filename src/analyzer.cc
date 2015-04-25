@@ -31,8 +31,23 @@ namespace vimlight
 
 			auto pos =  loc.position();
 			list.push_back({ pos.y, pos.x, pos.y, pos.x+1, "error" });
-
 			log << "\t\t" << pos.y << ", " << pos.x << '\n';
+
+			auto ranges = diag.ranges();
+			for (auto& range: ranges) {
+				auto head = range.head();
+				if (!head.is_from_main()) continue;
+
+				auto head_pos =       head  .position();
+				auto tail_pos = range.tail().position();
+
+				list.push_back({ head_pos.y, head_pos.x,
+						tail_pos.y, tail_pos.x+1, "error_range" });
+				log << "\t\t" << head_pos.y << ", " << head_pos.x
+					<< " -> " << tail_pos.y << ", " << tail_pos.x
+					<< "\n";
+			}
+
 		}
 
 		// semantic highlighting
