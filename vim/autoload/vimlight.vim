@@ -38,14 +38,14 @@ lua <<END
 			p.x = x
 			p.w = w
 			last[i] = p
-		--	local cmd = [==[matchaddpos("%s", [[%d, %d, %d]])]==]
-		--	last[i] = vim.eval(cmd:format(group, y, x, w))
 		end
 
 		env.del = function(i)
-		--	local cmd = [==[matchdelete(%d)]==]
-		--	vim.eval(cmd:format(last[i]))
-		--	last[i] = nil
+			if last[i].i then
+				local cmd = [==[matchdelete(%d)]==]
+				vim.eval(cmd:format(last[i].i))
+			end
+			last[i] = nil
 		end
 
 		env.viewport = function(y, h)
