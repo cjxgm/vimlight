@@ -6,7 +6,7 @@ work in progress...
                    <b>The MIT License (MIT) Modified</b>
 
 
-         <u>Copyright (C) eXerigumo Clanjor (Weiju Lan) 2014.</u>
+       <u>Copyright (C) eXerigumo Clanjor (Weiju Lan) 2014-2015.</u>
 
 
 
@@ -42,7 +42,7 @@ o   THE  SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 <pre style="font-family: monospace;">
                         <b>MIT 许可协议（修改版）</b>
 
-                 <u>版权所有 (C) 2014 哆啦比猫（兰威举）.</u>
+               <u>版权所有 (C) 2014-2015 哆啦比猫（兰威举）.</u>
 
 
 软件著作权持有人据此条款，授权许可任何获得该软件的副本和与其有关的文档
