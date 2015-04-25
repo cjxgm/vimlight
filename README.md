@@ -6,7 +6,7 @@ work in progress...
                    <b>The MIT License (MIT) Modified</b>
 
 
-       <u>Copyright (C) eXerigumo Clanjor (Weiju Lan) 2014-2015.</u>
+     <u>Copyright (C) Giumo Xavier Clanjor (Weiju Lan) 2014-2015.</u>
 
 
 
