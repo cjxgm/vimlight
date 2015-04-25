@@ -1,119 +1,104 @@
 #pragma once
 // an inter-thread multiple-writer single-reader communication channel.
 // this is used to pass events to another thread.
-#include <functional>
-#include <type_traits>
-#include <utility>
+// this is prioritized, i.e. a higher priority events will erase
+// subsequent lower priority ones.
 #include <mutex>
 #include <condition_variable>
-#include <list>
-#include <memory>
+#include <vector>
+#include <utility>		// for std::move
+#include "meta/variant.hh"
 
 namespace vimlight
 {
+	template <int PRIORITY>
+	struct event
+	{
+		static constexpr auto priority() { return PRIORITY; }
+	};
+
+	template <class ...EVENTS>
 	struct channel
 	{
-		template <class Event>
-		using listener_t = std::function<void(Event)>;
-		using listener_no_arg_t = std::function<void()>;
-
-		struct event
+		template <class EVENT>
+		void post(EVENT ev={})
 		{
-			event() = default;
-			event(event const&) = default;
-			event(event&&) = default;
-			event& operator=(event const&) = default;
-			event& operator=(event&&) = default;
-			virtual ~event() = default;
-		};
+			lock _(m);
+			/* FIXME: this may cause problems
+			while (priority_compare<EVENT::priority()>())
+				events.pop_back();
+			*/
+			events.emplace_back(std::move(ev));
+			cv.notify_one();
+		}
 
-		using event_ptr  = std::shared_ptr<event>;
-		using event_list = std::list<event_ptr>;
-		using listener_wrapper = std::function<bool(event*)>;
-		using listener_wrapper_list = std::list<listener_wrapper>;
-		using listener_remover = std::function<void()>;
+		template <class EVENT>
+		bool is()
+		{
+			lock _(m);
+			if (!events.size()) return false;
+			return events.front().template is<EVENT>();
+		}
 
+		template <class EVENT>
+		auto get()	// you should be sure there is a event
+		{
+			event_variant evar;
+			{
+				lock _(m);
+				evar = std::move(events.front());
+				events.erase(events.begin());
+			}
+			return evar.template strict_get<EVENT>();
+		}
+
+		template <class EVENT>
+		auto wait()
+		{
+			event_variant evar;
+			{
+				lock _(m);
+				cv.wait(_, [this] { return events.size(); });
+				evar = std::move(events.front());
+				events.erase(events.begin());
+			}
+			return evar.template strict_get<EVENT>();
+		}
+
+		template <class F>
+		decltype(auto) listen(F const& f={})
+		{
+			event_variant evar;
+			{
+				lock _(m);
+				cv.wait(_, [this] { return events.size(); });
+				evar = std::move(events.front());
+				events.erase(events.begin());
+			}
+			return evar.visit(f);
+		}
+
+	private:
 		using condv = std::condition_variable;
 		using mutex = std::mutex;
 		using lock  = std::unique_lock<mutex>;
 
+		using event_variant = meta::variant<EVENTS...>;
+		using event_list = std::vector<event_variant>;	// FIXME: vector or deque, that is a question
 
-		template <class Event>
-		listener_remover listen(listener_t<Event> lsnr)
-		{
-			static_assert(std::is_base_of<event, Event>(),
-					"Event must be a sub-class of channel::event");
-
-			lock _(m);
-
-			auto it = listeners.insert(listeners.end(),
-					[lsnr](event* ev) {
-						auto p = dynamic_cast<Event*>(ev);
-						if (!p) return false;
-						lsnr(std::move(*p));
-						return true;
-					});
-
-			return [this, it] {
-				listeners.erase(it);
-			};
-		}
-
-		template <class Event>
-		listener_remover listen(listener_no_arg_t lsnr)
-		{
-			static_assert(std::is_base_of<event, Event>(),
-					"Event must be a sub-class of channel::event");
-
-			return listen<Event>([lsnr](Event) { lsnr(); });
-		}
-
-		template <class Event>
-		void post(Event ev)
-		{
-			static_assert(std::is_base_of<event, Event>(),
-					"Event must be a sub-class of channel::event");
-
-			lock _(m);
-			events.push_back(std::make_shared<Event>(std::move(ev)));
-			cv.notify_one();
-		}
-
-		void wait()
-		{
-			event_ptr ev;
-			{
-				lock lck(m);
-				cv.wait(lck, [this] { return !events.empty(); });
-				ev = events.front();
-				events.pop_front();
-			}
-			for (auto& lsnr: listeners)
-				if (lsnr(ev.get()))
-					return;
-			throw *ev.get();
-		}
-
-		void poll()
-		{
-			event_ptr ev;
-			{
-				lock lck(m);
-				if (events.empty()) return;
-				ev = events.front();
-				events.pop_front();
-			}
-			for (auto& lsnr: listeners)
-				if (lsnr(ev.get()))
-					return;
-			throw *ev.get();
-		}
-
-	private:
 		condv cv;
 		mutex m;
-		listener_wrapper_list listeners;
 		event_list events;
+
+		template <int PRIORITY>
+		bool priority_compare()
+		{
+			if (!events.size()) return false;
+			return events.back().visit(
+					[](auto& ev) {
+						return (ev.priority() <= PRIORITY);
+					});
+		}
 	};
 }
 

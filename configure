@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 # vim: noet ts=4 sw=4 sts=0 fenc=utf8
 # License: The MIT License with modification. See LICENSE for details.
-# (C) 2014. eXerigumo Clanjor (哆啦比猫/兰威举) <cjxgm@126.com>
+# (C) 2014-2015. Giumo Xavier Clanjor (哆啦比猫/兰威举) <cjxgm@126.com>
 
 
 
@@ -50,7 +50,7 @@ sub write_makefile
 	print $makefile <<EOF;
 # vim: noet ts=4 sw=4 sts=0 fenc=utf8
 # License: The MIT License with modification. See LICENSE for details.
-# (C) 2014. eXerigumo Clanjor (哆啦比猫/兰威举) <cjxgm\@126.com>
+# (C) 2014-2015. Giumo Xavier Clanjor (哆啦比猫/兰威举) <cjxgm\@126.com>
 
 CXX = $CC
 LD = \$(CXX)
