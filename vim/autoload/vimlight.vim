@@ -128,8 +128,9 @@ lua <<END
 	end
 
 	vl.viewport = function(this)
-		-- FIXME: do not /4
-		this.cmd_env.viewport(vim.eval([[getcurpos()]])[1], vim.eval("&lines") / 4)
+		local y = vim.eval([[getcurpos()]])[1]
+		local h = vim.eval([[&lines]])
+		this.cmd_env.viewport(y, h)
 	end
 END
 

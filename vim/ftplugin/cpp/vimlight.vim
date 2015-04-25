@@ -18,4 +18,5 @@ au CursorHold	* call vimlight#update()
 au CursorHoldI	* call vimlight#update()
 au CursorMoved	* call vimlight#update()
 au CursorMovedI	* call vimlight#update()
+au VimResized	* call vimlight#update()
 
