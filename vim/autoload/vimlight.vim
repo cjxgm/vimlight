@@ -32,14 +32,41 @@ lua <<END
 		local env = {}
 
 		env.add = function(i, group, y, x, w)
-			local cmd = [==[matchaddpos("%s", [[%d, %d, %d]])]==]
-			last[i] = vim.eval(cmd:format(group, y, x, w))
+			local p = {}
+			p.group = group
+			p.y = y
+			p.x = x
+			p.w = w
+			last[i] = p
+		--	local cmd = [==[matchaddpos("%s", [[%d, %d, %d]])]==]
+		--	last[i] = vim.eval(cmd:format(group, y, x, w))
 		end
 
 		env.del = function(i)
-			local cmd = [==[matchdelete(%d)]==]
-			vim.eval(cmd:format(last[i]))
-			last[i] = nil
+		--	local cmd = [==[matchdelete(%d)]==]
+		--	vim.eval(cmd:format(last[i]))
+		--	last[i] = nil
+		end
+
+		env.viewport = function(y, h)
+			local inside = function(value)
+				return (value >= y-h and value <= y+h)
+			end
+
+			for _,p in pairs(last) do
+				if inside(p.y) then
+					if not p.i then
+						local cmd = [==[matchaddpos("%s", [[%d, %d, %d]])]==]
+						p.i = vim.eval(cmd:format(p.group, p.y, p.x, p.w))
+					end
+				else
+					if p.i then
+						local cmd = [==[matchdelete(%d)]==]
+						vim.eval(cmd:format(p.i))
+						p.i = nil
+					end
+				end
+			end
 		end
 
 		return env
@@ -99,6 +126,11 @@ lua <<END
 		this.engine.exit()
 		this.engine = {}
 	end
+
+	vl.viewport = function(this)
+		-- FIXME: do not /4
+		this.cmd_env.viewport(vim.eval([[getcurpos()]])[1], vim.eval("&lines") / 4)
+	end
 END
 
 function vimlight#update()
@@ -107,6 +139,7 @@ function vimlight#update()
 	endif
 lua <<END
 	vimlight:apply()
+	vimlight:viewport()
 	if vimlight.modified then
 		vimlight:update()
 	end
