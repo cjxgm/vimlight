@@ -71,7 +71,7 @@ lua <<END
 	end
 	vl.cmd_env = command_environment()
 
-	vl.apply = function(this)
+	vl.fetch = function(this)
 		if this.done then return end
 		while true do
 			local cmds = this.engine.get()
@@ -84,7 +84,7 @@ lua <<END
 
 	vl.finish = function(this)
 		while not this.done do
-			this:apply()
+			this:fetch()
 		end
 	end
 
@@ -125,7 +125,7 @@ lua <<END
 		this.engine = {}
 	end
 
-	vl.viewport = function(this)
+	vl.view = function(this)
 		local y = vim.eval([[getcurpos()]])[1]
 		local h = vim.eval([[&lines]])
 		this.cmd_env.view(y, h)
@@ -137,8 +137,8 @@ function vimlight#update()
 		return
 	endif
 lua <<END
-	vimlight:apply()
-	vimlight:viewport()
+	vimlight:fetch()
+	vimlight:view()
 	if vimlight.modified then
 		vimlight:update()
 	end
