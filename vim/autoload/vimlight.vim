@@ -27,18 +27,24 @@ lua <<END
 		cpp = "-std=gnu++14 -Wall -Wextra",
 	}
 
-	vl.cmd_env = {}
-	local ce = vl.cmd_env
-	ce.last = {}
-	ce.add = function(i, group, y, x, w)
-		local cmd = [==[matchaddpos("%s", [[%d, %d, %d]])]==]
-		ce.last[i] = vim.eval(cmd:format(group, y, x, w))
+	local command_environment = function()
+		local last = {}
+		local env = {}
+
+		env.add = function(i, group, y, x, w)
+			local cmd = [==[matchaddpos("%s", [[%d, %d, %d]])]==]
+			last[i] = vim.eval(cmd:format(group, y, x, w))
+		end
+
+		env.del = function(i)
+			local cmd = [==[matchdelete(%d)]==]
+			vim.eval(cmd:format(last[i]))
+			last[i] = nil
+		end
+
+		return env
 	end
-	ce.del = function(i)
-		local cmd = [==[matchdelete(%d)]==]
-		vim.eval(cmd:format(ce.last[i]))
-		ce.last[i] = nil
-	end
+	vl.cmd_env = command_environment()
 
 	vl.apply = function(this)
 		if this.done then return end
