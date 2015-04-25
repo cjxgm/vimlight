@@ -36,11 +36,7 @@ namespace vimlight
 				if (!worker::done()) return 0;
 
 				auto cmds = worker::get();
-				s.table(cmds.size(), 0);
-				for (decltype(cmds.size()) i=0; i<cmds.size(); i++) {
-					s.push(cmds[i]);
-					s.field(-2, i+1);
-				}
+				s.push(cmds);
 				return 1;
 			};
 
