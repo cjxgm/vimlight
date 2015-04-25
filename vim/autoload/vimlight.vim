@@ -28,25 +28,50 @@ lua <<END
 	}
 
 	local command_environment = function()
-		local last = {}
+		local highlights = {}
 		local env = {}
 
+		local match_add = function(highlight)
+			local hl = highlight
+			if not hl.match then
+				local cmd = [==[matchaddpos("%s", [[%d, %d, %d]])]==]
+				hl.match = vim.eval(cmd:format(hl.group, hl.y, hl.x, hl.w))
+			end
+		end
+
+		local match_del = function(highlight)
+			local hl = highlight
+			if hl.match then
+				local cmd = [[matchdelete(%d)]]
+				vim.eval(cmd:format(hl.match))
+				hl.match = nil
+			end
+		end
+
 		env.add = function(i, group, y, x, w)
-			local cmd = [==[matchaddpos("%s", [[%d, %d, %d]])]==]
-			last[i] = vim.eval(cmd:format(group, y, x, w))
+			highlights[i] = { group = group, y = y, x = x, w = w }
 		end
 
 		env.del = function(i)
-			local cmd = [==[matchdelete(%d)]==]
-			vim.eval(cmd:format(last[i]))
-			last[i] = nil
+			match_del(highlights[i])
+			highlights[i] = nil
+		end
+
+		env.view = function(y, h)
+			local inside = function(value)
+				return (value >= y-h and value <= y+h)
+			end
+
+			for _,hl in pairs(highlights) do
+				(inside(hl.y) and match_add or match_del)(hl)
+			end
 		end
 
 		return env
 	end
 	vl.cmd_env = command_environment()
 
-	vl.apply = function(this)
+	vl.fetch = function(this)
 		if this.done then return end
 		while true do
 			local cmds = this.engine.get()
@@ -59,7 +84,7 @@ lua <<END
 
 	vl.finish = function(this)
 		while not this.done do
-			this:apply()
+			this:fetch()
 		end
 	end
 
@@ -99,6 +124,12 @@ lua <<END
 		this.engine.exit()
 		this.engine = {}
 	end
+
+	vl.view = function(this)
+		local y = vim.eval([[getcurpos()]])[1]
+		local h = vim.eval([[&lines]])
+		this.cmd_env.view(y, h)
+	end
 END
 
 function vimlight#update()
@@ -106,7 +137,8 @@ function vimlight#update()
 		return
 	endif
 lua <<END
-	vimlight:apply()
+	vimlight:fetch()
+	vimlight:view()
 	if vimlight.modified then
 		vimlight:update()
 	end

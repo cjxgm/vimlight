@@ -22,7 +22,7 @@ init_list_brace		Define		# initializer list's brace
 special_function_call	Function	# highlight "func" in "ns::func<type>(arg)"
 special_member_call		Function	# highlight "func" in "obj.func<type>(arg)"
 
-# FIXME: they are too slow when enabled
+# FIXME: not everyone like them?
 #operator_call		Label
 #member				VisualNOS
 #parameter			TabLine
