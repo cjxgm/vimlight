@@ -52,9 +52,12 @@ lua <<END
 			highlights[i] = { group = group, y = y, x = x, w = w }
 		end
 
-		env.del = function(i)
-			match_del(highlights[i])
-			highlights[i] = nil
+		env.clear = function(i)
+			local hls = highlights
+			for i,hl in pairs(hls) do
+				match_del(hl)
+				hls[i] = nil
+			end
 		end
 
 		env.view = function(y, h)

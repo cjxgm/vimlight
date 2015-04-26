@@ -58,8 +58,7 @@ namespace vimlight
 			{
 				log << "(worker) parse request\n";
 				auto result = analyzer.parse(ev.src, group);
-				collector.update(std::move(result), vim);
-				chn_main.post<events::result>({std::move(vim.get())});
+				chn_main.post<events::result>({vim::highlight(result)});
 				return true;
 			}
 
@@ -72,34 +71,25 @@ namespace vimlight
 				return true;
 			}
 
-			worker_callback(vimlight::vim & vim,
+			worker_callback(
 					vimlight::analyzer & analyzer,
-					highlight::group & group,
-					highlight::collector & collector)
-				: vim{vim}
-				, analyzer{analyzer}
-				, group{group}
-				, collector{collector} {}
+					highlight::group & group)
+				: analyzer{analyzer}
+				, group{group} {}
 
 		private:
-			vimlight::vim & vim;
 			vimlight::analyzer & analyzer;
 			highlight::group & group;
-			highlight::collector & collector;
 		};
 
 		void start(filename_type const& hlgroup)
 		{
 			th = std::thread{[&hlgroup] {
-				vimlight::vim vim;
 				vimlight::analyzer analyzer;
 				highlight::group group(hlgroup);
-				highlight::collector collector;
 				chn_main.post<events::done>();
 
-				while (chn_worker.listen<worker_callback>({
-							vim, analyzer, group, collector}))
-				{}
+				while (chn_worker.listen<worker_callback>({analyzer, group})) {}
 			}};
 
 			chn_main.wait<events::done>();
