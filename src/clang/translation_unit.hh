@@ -69,10 +69,10 @@ namespace clang
 		}
 
 		void visualize()
-#ifdef LOG
-		;
-#else
+#ifdef RELEASE
 		{}
+#else
+		;
 #endif
 
 	private:
