@@ -2,12 +2,15 @@
 #include "log.hh"
 #include <utility>
 
-static bool is_identifier(char c)
+namespace
 {
-	return (('a' <= c && c <= 'z') ||
-			('A' <= c && c <= 'Z') ||
-			('0' <= c && c <= '9') ||
-			c == '_' || c == '$');
+	bool is_identifier(char c)
+	{
+		return (('a' <= c && c <= 'z') ||
+				('A' <= c && c <= 'Z') ||
+				('0' <= c && c <= '9') ||
+				c == '_' || c == '$');
+	}
 }
 
 namespace vimlight
