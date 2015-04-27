@@ -8,11 +8,8 @@ namespace vimlight
 		{
 			commands_type cmds{"clear()\n"};
 
-			auto i=0;
 			for (auto& rec: hls) {
-				cmds += "add(";
-				cmds += std::to_string(i++);
-				cmds += ",\"";
+				cmds += "add(\"";
 				cmds += rec.name;
 				cmds += "\",";
 				cmds += std::to_string(rec.y1);
