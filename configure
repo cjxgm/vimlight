@@ -143,7 +143,6 @@ test: all uninstall
 	\@echo "\$(COLOR_CMD)testing" "\$(COLOR_ARG)$name\$(COLOR_RST)"
 	mkdir -p ~/.vim/bundle/
 	cp -r vim/ ~/.vim/bundle/$name/
-	mkdir -p ~/.vim/bundle/$name/lib/
 	cp $dest ~/.vim/bundle/$name/lib/
 	$test
 commit: cleanall
@@ -155,7 +154,6 @@ bundle: release
 	\@echo "\$(COLOR_CMD)bundling" "\$(COLOR_ARG)$name\$(COLOR_RST)"
 	rm -rf \$(BUNDLE)
 	cp -r vim/  \$(BUNDLE)
-	mkdir -p \$(BUNDLE)/lib/
 	cp $dest \$(BUNDLE)/lib/
 	cp README.md \$(BUNDLE)/
 	cp LICENSE* \$(BUNDLE)/
