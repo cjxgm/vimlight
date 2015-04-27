@@ -48,13 +48,13 @@ lua <<END
 			end
 		end
 
-		env.add = function(i, group, y, x, w)
-			highlights[i] = { group = group, y = y, x = x, w = w }
+		env.add = function(group, y, x, w)
+			highlights[#highlights+1] = { group = group, y = y, x = x, w = w }
 		end
 
 		env.clear = function(i)
 			local hls = highlights
-			for i,hl in pairs(hls) do
+			for i,hl in ipairs(hls) do
 				match_del(hl)
 				hls[i] = nil
 			end
@@ -65,7 +65,7 @@ lua <<END
 				return (value >= y-h and value <= y+h)
 			end
 
-			for _,hl in pairs(highlights) do
+			for _,hl in ipairs(highlights) do
 				(inside(hl.y) and match_add or match_del)(hl)
 			end
 		end
