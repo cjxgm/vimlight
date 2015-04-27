@@ -1,6 +1,29 @@
 #include "analyzer.hh"
 #include "log.hh"
 #include <utility>
+#include <string>
+
+namespace
+{
+	bool is_identifier(char c)
+	{
+		return (('a' <= c && c <= 'z') ||
+				('A' <= c && c <= 'Z') ||
+				('0' <= c && c <= '9') ||
+				c == '_' || c == '$');
+	}
+
+	bool is_operator(std::string const& x)
+	{
+		constexpr auto op = "operator";
+		constexpr auto op_size = sizeof(op);
+		static_assert(op_size == 8, "portability issue?");
+		if (x.size() <= op_size) return false;
+		if (x.substr(0, op_size) != op) return false;
+		return !is_identifier(x[op_size]);
+	}
+}
+
 
 namespace vimlight
 {
@@ -90,6 +113,7 @@ namespace vimlight
 					log << "\t\t" << kind << " (initializer list braces)\n";
 				}
 
+				// function call
 				else if (kind == "CallExpr" && ref_kind != "CXXConstructor") {
 					auto oc = cursor.first_child();
 					if (oc) {
@@ -106,6 +130,18 @@ namespace vimlight
 							list.push_back({ pos.y, pos.x, pos.y, pos.x+name_size, kind });
 							log << "\t\t" << kind << " (function call)\n";
 						}
+					}
+				}
+
+				// function declaration
+				else if (kind == "FunctionDecl" ||
+						kind == "FunctionTemplate" ||
+						kind == "CXXMethod") {
+					if (!is_operator(name)) {
+						auto kind = group.at("function_decl");
+						int name_size = name.size();
+						list.push_back({ pos.y, pos.x, pos.y, pos.x+name_size, kind });
+						log << "\t\t" << kind << " (function declaration)\n";
 					}
 				}
 

@@ -20,12 +20,10 @@ VariableRef			Underlined	# variable name in lambda's capture list
 error				Error		# error
 error_range			Error		# error range
 init_list_brace		Define		# initializer list's brace
-function_call		Function	# highlight "func" in "ns::func<type>(arg)"
-special_function_call	Function	# highlight "func" in "ns::func<type>(arg)"
-special_member_call		Function	# highlight "func" in "obj.func<type>(arg)"
+function_call		Function	# highlight function call
+function_decl		Function	# highlight function declaration
 
 # FIXME: not everyone like them?
-#operator_call		Label
 #member				VisualNOS
 #parameter			TabLine
 
