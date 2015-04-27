@@ -24,20 +24,11 @@ namespace vimlight
 		}
 	}
 
-#define CAT2(X, Y)		X ## Y
-#define CAT(X, Y)		CAT2(X, Y)
-
-#ifdef LOG
-#	define LOG_SYSTEM	CAT(LOG, _log)
+#ifdef RELEASE
+	namespace log_system = no_log;
 #else
-#	define LOG_SYSTEM	no_log
+	namespace log_system = file_log;
 #endif
-
-	namespace log_system = LOG_SYSTEM;
-
-#undef LOG_SYSTEM
-#undef CAT
-#undef CAT2
 
 	extern log_system::log log;
 }

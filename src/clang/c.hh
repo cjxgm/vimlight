@@ -11,140 +11,126 @@
 #include <clang-c/Index.h>
 #include <utility>
 
-
-
+#define TYPE(NAME)			using type = ::CX ## NAME
+#define FUNC(NAME, CNAME)	constexpr auto NAME = ::clang_ ## CNAME
+#define ENUM(NAME, CNAME)	constexpr auto NAME = ::CX ## CNAME
 
 namespace clang
 {
 	namespace c
 	{
-#define FORWARD_TYPE(NAME) \
-		using type = ::CX ## NAME
-
-#define FORWARD_FUNC(NAME, CNAME) \
-		constexpr auto NAME = ::clang_ ## CNAME
-
-#define FORWARD_ENUM(NAME, CNAME) \
-		constexpr auto NAME = ::CX ## CNAME
-
-
-
-
 		namespace index
 		{
-			FORWARD_TYPE(Index);
-			FORWARD_FUNC(create, createIndex);
-			FORWARD_FUNC(dispose, disposeIndex);
+			TYPE(Index);
+			FUNC(create, createIndex);
+			FUNC(dispose, disposeIndex);
 		}
 
 		namespace translation_unit
 		{
-			FORWARD_TYPE(TranslationUnit);
-			FORWARD_FUNC(parse, parseTranslationUnit);
-			FORWARD_FUNC(dispose, disposeTranslationUnit);
-			FORWARD_FUNC(reparse, reparseTranslationUnit);
-			FORWARD_FUNC(get_cursor, getTranslationUnitCursor);
+			TYPE(TranslationUnit);
+			FUNC(parse, parseTranslationUnit);
+			FUNC(dispose, disposeTranslationUnit);
+			FUNC(reparse, reparseTranslationUnit);
+			FUNC(get_cursor, getTranslationUnitCursor);
 			namespace flag
 			{
-				FORWARD_TYPE(TranslationUnit_Flags);
-				FORWARD_ENUM(none, TranslationUnit_None);
-				FORWARD_ENUM(incomplete, TranslationUnit_Incomplete);
+				TYPE(TranslationUnit_Flags);
+				ENUM(none, TranslationUnit_None);
+				ENUM(incomplete, TranslationUnit_Incomplete);
 			}
 		}
 
 		namespace cursor
 		{
-			FORWARD_TYPE(Cursor);
-			FORWARD_FUNC(get_extent, getCursorExtent);
-			FORWARD_FUNC(get_location, getCursorLocation);
-			FORWARD_FUNC(get_kind, getCursorKind);
-			FORWARD_FUNC(get_spelling, getCursorSpelling);
-			FORWARD_FUNC(get_type, getCursorType);
-			FORWARD_FUNC(get_referenced, getCursorReferenced);
+			TYPE(Cursor);
+			FUNC(get_extent, getCursorExtent);
+			FUNC(get_location, getCursorLocation);
+			FUNC(get_kind, getCursorKind);
+			FUNC(get_spelling, getCursorSpelling);
+			FUNC(get_type, getCursorType);
+			FUNC(get_referenced, getCursorReferenced);
 			namespace childs
 			{
 				namespace visit_result
 				{
-					FORWARD_TYPE(ChildVisitResult);
-					FORWARD_ENUM(into, ChildVisit_Recurse);
-					FORWARD_ENUM(next, ChildVisit_Continue);
-					FORWARD_ENUM(stop, ChildVisit_Break);
+					TYPE(ChildVisitResult);
+					ENUM(into, ChildVisit_Recurse);
+					ENUM(next, ChildVisit_Continue);
+					ENUM(stop, ChildVisit_Break);
 				}
-				FORWARD_FUNC(visit, visitChildren);
+				FUNC(visit, visitChildren);
 			}
 			namespace kind
 			{
-				FORWARD_TYPE(CursorKind);
-				FORWARD_FUNC(get_spelling, getCursorKindSpelling);
-				FORWARD_FUNC(is_declaration, isDeclaration);
-				FORWARD_FUNC(is_reference, isReference);
+				TYPE(CursorKind);
+				FUNC(get_spelling, getCursorKindSpelling);
+				FUNC(is_declaration, isDeclaration);
+				FUNC(is_reference, isReference);
 			}
 		}
 
 		namespace range
 		{
-			FORWARD_TYPE(SourceRange);
-			FORWARD_FUNC(get_start, getRangeStart);
-			FORWARD_FUNC(get_end, getRangeEnd);
+			TYPE(SourceRange);
+			FUNC(get_start, getRangeStart);
+			FUNC(get_end, getRangeEnd);
 		}
 
 		namespace location
 		{
-			FORWARD_TYPE(SourceLocation);
-			FORWARD_FUNC(get_spelling, getSpellingLocation);
-			FORWARD_FUNC(is_from_main_file, Location_isFromMainFile);
-			FORWARD_FUNC(get_file, getFileLocation);
+			TYPE(SourceLocation);
+			FUNC(get_spelling, getSpellingLocation);
+			FUNC(is_from_main_file, Location_isFromMainFile);
+			FUNC(get_file, getFileLocation);
 		}
 
 		namespace string
 		{
-			FORWARD_TYPE(String);
-			FORWARD_FUNC(dispose, disposeString);
-			FORWARD_FUNC(cstr, getCString);
+			TYPE(String);
+			FUNC(dispose, disposeString);
+			FUNC(cstr, getCString);
 		}
 
 		namespace unsaved_file
 		{
-			FORWARD_TYPE(UnsavedFile);
+			TYPE(UnsavedFile);
 		}
 
 		namespace file
 		{
-			FORWARD_TYPE(File);
-			FORWARD_FUNC(get_name, getFileName);
+			TYPE(File);
+			FUNC(get_name, getFileName);
 		}
 
 		namespace options
 		{
-			FORWARD_FUNC(default_reparse, defaultReparseOptions);
-			FORWARD_FUNC(default_diagnostic_display, defaultDiagnosticDisplayOptions);
+			FUNC(default_reparse, defaultReparseOptions);
+			FUNC(default_diagnostic_display, defaultDiagnosticDisplayOptions);
 		}
 
 		namespace diagnostic
 		{
 			namespace set
 			{
-				FORWARD_TYPE(DiagnosticSet);
-				FORWARD_FUNC(dispose, disposeDiagnosticSet);
-				FORWARD_FUNC(from_translation_unit, getDiagnosticSetFromTU);
-				FORWARD_FUNC(get, getDiagnosticInSet);
-				FORWARD_FUNC(get_count, getNumDiagnosticsInSet);
+				TYPE(DiagnosticSet);
+				FUNC(dispose, disposeDiagnosticSet);
+				FUNC(from_translation_unit, getDiagnosticSetFromTU);
+				FUNC(get, getDiagnosticInSet);
+				FUNC(get_count, getNumDiagnosticsInSet);
 			}
-			FORWARD_TYPE(Diagnostic);
-			FORWARD_FUNC(dispose, disposeDiagnostic);
-			FORWARD_FUNC(get_childs, getChildDiagnostics);
-			FORWARD_FUNC(get_location, getDiagnosticLocation);
-			FORWARD_FUNC(get_range, getDiagnosticRange);
-			FORWARD_FUNC(get_range_count, getDiagnosticNumRanges);
-			FORWARD_FUNC(format, formatDiagnostic);
+			TYPE(Diagnostic);
+			FUNC(dispose, disposeDiagnostic);
+			FUNC(get_childs, getChildDiagnostics);
+			FUNC(get_location, getDiagnosticLocation);
+			FUNC(get_range, getDiagnosticRange);
+			FUNC(get_range_count, getDiagnosticNumRanges);
+			FUNC(format, formatDiagnostic);
 		}
-
-
-
-
-#undef FORWARD_ENUM
-#undef FORWARD_FUNC
-#undef FORWARD_TYPE
 	}
 }
+
+#undef ENUM
+#undef FUNC
+#undef TYPE
 

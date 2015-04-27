@@ -11,6 +11,8 @@ namespace vimlight
 	{
 		void group::load(filename_type const& fn)
 		{
+			struct bad_file {};
+
 			std::ifstream f(fn);
 
 			while (f) {
