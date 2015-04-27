@@ -36,8 +36,6 @@ function vimlight#enter()
 		return
 	endif
 
-	syn match cppFunction "\zs\w\+\ze\s*("
-	hi def link cppFunction Function
 	syn match cppBinNumber "0b[01]\+"
 	hi def link cppBinNumber cNumber
 	syn match cppNamespaceSep "::"

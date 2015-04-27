@@ -20,6 +20,7 @@ VariableRef			Underlined	# variable name in lambda's capture list
 error				Error		# error
 error_range			Error		# error range
 init_list_brace		Define		# initializer list's brace
+function_call		Function	# highlight "func" in "ns::func<type>(arg)"
 special_function_call	Function	# highlight "func" in "ns::func<type>(arg)"
 special_member_call		Function	# highlight "func" in "obj.func<type>(arg)"
 
