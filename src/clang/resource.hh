@@ -36,7 +36,7 @@ namespace clang
 		{
 			using value_type = VALUE;
 			using self = unique;
-			using super = bin<VALUE>;
+			using super = bin<value_type>;
 			using deleter_type = std::function<void(value_type)>;
 
 			unique(deleter_type d) : owned(false), deleter(d) {}
