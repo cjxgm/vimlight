@@ -55,6 +55,7 @@ namespace clang
 			{
 				other.owned = false;
 			}
+
 			self& operator=(self&& other)
 			{
 				delete_if_owned();
