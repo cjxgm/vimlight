@@ -25,33 +25,34 @@ namespace vimlight
 		// analyze errors
 		auto diags = tu.diagnostics();
 		log << "analyzer::parse():\n";
-		for (auto& diag: diags) {
-			log << "\t[error]\n"
-				<< "\t\t" << diag.text() << '\n';
+		for (auto& diag: diags)
+			try {
+				log << "\t[error]\n"
+					<< "\t\t" << diag.text() << '\n';
 
-			auto loc = diag.location();
-			if (!loc.is_from_main()) continue;
+				auto loc = diag.location();
+				if (!loc.is_from_main()) continue;
 
-			auto pos =  loc.position();
-			list.push_back({ pos.y, pos.x, pos.y, pos.x+1, "error" });
-			log << "\t\t" << pos.y << ", " << pos.x << '\n';
+				auto pos =  loc.position();
+				list.push_back({ pos.y, pos.x, pos.y, pos.x+1, group.at("error") });
+				log << "\t\t" << pos.y << ", " << pos.x << '\n';
 
-			auto ranges = diag.ranges();
-			for (auto& range: ranges) {
-				auto head = range.head();
-				if (!head.is_from_main()) continue;
+				auto ranges = diag.ranges();
+				for (auto& range: ranges) {
+					auto head = range.head();
+					if (!head.is_from_main()) continue;
 
-				auto head_pos =       head  .position();
-				auto tail_pos = range.tail().position();
+					auto head_pos =       head  .position();
+					auto tail_pos = range.tail().position();
 
-				list.push_back({ head_pos.y, head_pos.x,
-						tail_pos.y, tail_pos.x+1, "error_range" });
-				log << "\t\t" << head_pos.y << ", " << head_pos.x
-					<< " -> " << tail_pos.y << ", " << tail_pos.x
-					<< "\n";
+					list.push_back({ head_pos.y, head_pos.x,
+							tail_pos.y, tail_pos.x+1, group.at("error_range") });
+					log << "\t\t" << head_pos.y << ", " << head_pos.x
+						<< " -> " << tail_pos.y << ", " << tail_pos.x
+						<< "\n";
+				}
 			}
-
-		}
+			catch (std::out_of_range) {}
 
 		// semantic highlighting
 		tu.cursor().each_child([&](clang::cursor const& cursor) {
