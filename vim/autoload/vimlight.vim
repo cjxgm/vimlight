@@ -1,4 +1,4 @@
-" vimlight: clang semantic highlighter for vim
+" vimlight. clang semantic highlighter for vim
 " vim: noet ts=4 sw=4 sts=0
 "
 " Copyright: (C) 2014 eXerigumo Clanjor(哆啦比猫/兰威举) <cjxgm@126.com>
@@ -11,28 +11,12 @@ endif
 let g:loaded_vimlight = 1
 
 lua <<END
-	local root = vim.eval[[expand("<sfile>:h:h")]]
-	package.cpath = ("%s;%s/lib/?.so"):format(package.cpath, root)
-
-	vimlight = {}	-- global variable intentionally
-	local vl = vimlight
-	vl.engine = require 'vimlight_engine'
-
-	vl.engine.init(root .. "/etc/hlgroup.vimlight")
-	vl.done = true
-	vl.modified = true
-
-	vl.default_options = {
-		c = "-std=gnu11 -Wall -Wextra",
-		cpp = "-std=gnu++14 -Wall -Wextra",
-	}
-
-	local command_environment = function()
+	local make_command_environment = function()
 		local highlights = {}
 		local env = {}
 
 		local hls = function()
-			local id = vim.eval([[bufnr("")]]);
+			local id = vim.eval[[bufnr("")]];
 			if not highlights[id] then highlights[id] = {} end
 			return highlights[id]
 		end
@@ -43,7 +27,7 @@ lua <<END
 		end
 
 		local hls_clear = function()
-			local id = vim.eval([[bufnr("")]]);
+			local id = vim.eval[[bufnr("")]];
 			highlights[id] = {}
 		end
 
@@ -87,67 +71,83 @@ lua <<END
 
 		return env
 	end
-	vl.cmd_env = command_environment()
 
-	vl.fetch = function(this)
-		if this.done then return end
-		while true do
-			local cmds = this.engine.get()
-			if cmds == nil then break end
-			load(cmds, "vimlight-command", 't', this.cmd_env)()
-			this.done = true
+	local make_vimlight = function(root)
+		local engine = require 'vimlight_engine'
+		engine.init(root .. "/etc/hlgroup.vimlight")
+
+		local default_options = {
+			c = "-std=gnu11 -Wall -Wextra",
+			cpp = "-std=gnu++14 -Wall -Wextra",
+		}
+		local cmd_env = make_command_environment()
+		local done = true
+		local modified = true
+		local vl = {}
+		local file
+		local option
+
+		vl.fetch = function()
+			if done then return end
+			while true do
+				local cmds = engine.get()
+				if cmds == nil then break end
+				load(cmds, "vimlight-command", 't', cmd_env)()
+				done = true
+			end
+			return done
 		end
-		return this.done
-	end
 
-	vl.finish = function(this)
-		while not this.done do
-			this:fetch()
+		vl.finish = function()
+			while not done do fetch() end
+		end
+
+		vl.update = function()
+			if done then
+				done = false
+				modified = false
+				local src = vim.eval[[join(getline(1, '$'), '\n')]]
+				engine.request(src)
+			end
+		end
+
+		vl.modify = function()
+			modified = true
+		end
+
+		vl.rename = function()
+			file = vim.eval[[expand('%')]]
+			local ft = vim.eval[[&ft]]
+			if file == "" then file = "source." .. ft end
+		end
+
+		vl.reoption = function()
+			local opt = vim.eval[[exists("b:vimlight_option") ? b:vimlight_option : ""]]
+			if opt == "" then opt = nil end
+			local ft = vim.eval[[&ft]]
+			local default = default_options[ft] or ""
+			option = opt or default
+		end
+
+		vl.setup = function()
+			engine.setup(file, option)
+		end
+
+		vl.leave = function()
+			engine.exit()
+			engine = {}
+		end
+
+		vl.view = function()
+			local y = vim.eval[[getcurpos()]][1]
+			local h = vim.eval[[&lines]]
+			cmd_env.view(y, h)
 		end
 	end
 
-	vl.update = function(this)
-		if this.done then
-			this.done = false
-			this.modified = false
-			local src = vim.eval("join(getline(1, '$'), '\n')")
-			this.engine.request(src)
-		end
-	end
-
-	vl.modify = function(this)
-		this.modified = true
-	end
-
-	vl.rename = function(this)
-		local file = vim.eval("expand('%')")
-		local ft = vim.eval("&ft")
-		if file == "" then file = "source." .. ft end
-		this.file = file
-	end
-
-	vl.reoption = function(this)
-		local opt = vim.eval([[ exists("b:vimlight_option") ? b:vimlight_option : "" ]])
-		if opt == "" then opt = nil end
-		local ft = vim.eval("&ft")
-		local default = this.default_options[ft] or ""
-		this.option = opt or default or ""
-	end
-
-	vl.setup = function(this)
-		this.engine.setup(this.file, this.option)
-	end
-
-	vl.leave = function(this)
-		this.engine.exit()
-		this.engine = {}
-	end
-
-	vl.view = function(this)
-		local y = vim.eval([[getcurpos()]])[1]
-		local h = vim.eval([[&lines]])
-		this.cmd_env.view(y, h)
-	end
+	local root = vim.eval[[expand("<sfile>:h:h")]]
+	package.cpath = ("%s;%s/lib/?.so"):format(package.cpath, root)
+	vimlight = make_vimlight(root)	-- global variable intentionally
 END
 
 function vimlight#update()
@@ -155,16 +155,16 @@ function vimlight#update()
 		return
 	endif
 lua <<END
-	vimlight:fetch()
-	vimlight:view()
+	vimlight.fetch()
+	vimlight.view()
 	if vimlight.modified then
-		vimlight:update()
+		vimlight.update()
 	end
 END
 endf
 
 function vimlight#modify()
-	lua vimlight:modify()
+	lua vimlight.modify()
 	call vimlight#update()
 endf
 
@@ -180,35 +180,35 @@ function vimlight#enter()
 	syn match cppNamespaceSep "::"
 	hi def link cppNamespaceSep Special
 
-	lua vimlight:rename()
-	lua vimlight:reoption()
-	lua vimlight:setup()
+	lua vimlight.rename()
+	lua vimlight.reoption()
+	lua vimlight.setup()
 	call vimlight#modify()
 endf
 
 function vimlight#finish()
-	lua vimlight:finish()
-	lua vimlight:view()
+	lua vimlight.finish()
+	lua vimlight.view()
 endf
 
 function vimlight#leave()
-	lua vimlight:leave()
+	lua vimlight.leave()
 endf
 
 
 " user function
 function vimlight#option(opt)
 	let b:vimlight_option = a:opt
-	lua vimlight:reoption()
-	lua vimlight:setup()
+	lua vimlight.reoption()
+	lua vimlight.setup()
 	call vimlight#modify()
 endf
 
 " user function
 function vimlight#default_option()
 	unlet! b:vimlight_option
-	lua vimlight:reoption()
-	lua vimlight:setup()
+	lua vimlight.reoption()
+	lua vimlight.setup()
 	call vimlight#modify()
 endf
 
