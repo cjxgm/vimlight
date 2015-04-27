@@ -21,11 +21,9 @@ function vimlight#update()
 	if &ft != "cpp" && &ft != "c"
 		return
 	endif
-lua <<END
-	vimlight.fetch()
-	vimlight.view()
-	vimlight.update()
-END
+	lua vimlight.fetch()
+	lua vimlight.view()
+	lua vimlight.update()
 endf
 
 function vimlight#modify()
