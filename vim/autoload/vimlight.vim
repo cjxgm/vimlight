@@ -31,6 +31,22 @@ lua <<END
 		local highlights = {}
 		local env = {}
 
+		local hls = function()
+			local id = vim.eval([[bufnr("")]]);
+			if not highlights[id] then highlights[id] = {} end
+			return highlights[id]
+		end
+
+		local hls_push = function(hl)
+			local hs = hls()
+			hs[#hs+1] = hl
+		end
+
+		local hls_clear = function()
+			local id = vim.eval([[bufnr("")]]);
+			highlights[id] = {}
+		end
+
 		local match_add = function(highlight)
 			local hl = highlight
 			if not hl.match then
@@ -49,15 +65,14 @@ lua <<END
 		end
 
 		env.add = function(group, y, x, w)
-			highlights[#highlights+1] = { group = group, y = y, x = x, w = w }
+			hls_push { group = group, y = y, x = x, w = w }
 		end
 
 		env.clear = function(i)
-			local hls = highlights
-			for i,hl in ipairs(hls) do
+			for _,hl in ipairs(hls()) do
 				match_del(hl)
-				hls[i] = nil
 			end
+			hls_clear()
 		end
 
 		env.view = function(y, h)
@@ -65,7 +80,7 @@ lua <<END
 				return (value >= y-h and value <= y+h)
 			end
 
-			for _,hl in ipairs(highlights) do
+			for _,hl in ipairs(hls()) do
 				(inside(hl.y) and match_add or match_del)(hl)
 			end
 		end
@@ -173,6 +188,7 @@ endf
 
 function vimlight#finish()
 	lua vimlight:finish()
+	lua vimlight:view()
 endf
 
 function vimlight#leave()
