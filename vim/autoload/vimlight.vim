@@ -103,10 +103,11 @@ lua <<END
 		end
 
 		vl.update = function()
+			if not modified then return end
 			if done then
 				done = false
 				modified = false
-				local src = vim.eval[[join(getline(1, '$'), '\n')]]
+				local src = vim.eval[[join(getline(1, '$'), "\n")]]
 				engine.request(src)
 			end
 		end
@@ -159,9 +160,7 @@ function vimlight#update()
 lua <<END
 	vimlight.fetch()
 	vimlight.view()
-	if vimlight.modified then
-		vimlight.update()
-	end
+	vimlight.update()
 END
 endf
 
