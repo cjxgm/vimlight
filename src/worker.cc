@@ -1,6 +1,6 @@
 #include "worker.hh"
 #include "channel.hh"
-#include "highlight/all.hh"
+#include "highlight/group.hh"
 #include "log.hh"
 #include <thread>
 #include <utility>

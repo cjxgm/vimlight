@@ -1,7 +1,8 @@
 #pragma once
 // analyzer analyzes source code and produce a highlight list.
-#include "clang/all.hh"
-#include "highlight/all.hh"
+#include "clang/translation_unit.hh"
+#include "highlight/group.hh"
+#include "highlight/list.hh"
 
 namespace vimlight
 {

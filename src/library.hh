@@ -1,7 +1,7 @@
 #pragma once
 // this is a lua library.
 // this module implements all the functions exposed to lua.
-#include "lua/all.hh"
+#include "lua/lua.hh"
 
 namespace vimlight
 {

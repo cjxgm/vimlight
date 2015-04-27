@@ -11,27 +11,49 @@ my $CCFLAGS = "-std=gnu++14 -march=native -O3 -Wall -Wextra -fPIC";
 my $LDFLAGS = "-pthread -lclang -shared";
 my $name = "vimlight";
 my $dest = "./${name}_engine.so";
-my $test = "exit 1";
+my $test = "";
 my @libs = qw(lua);
+my $ver  = `printf "r%s.%s" "\$(git rev-list --count HEAD)" "\$(git rev-parse --short HEAD)"`;
 
 
 
 
-my @dirs;
+
+my $COLOR_RST = "\e[0m";
+my $COLOR_CMD = "\e[0;32m";
+my $COLOR_VER = "\e[0;33m";
+my $COLOR_DIR = "\e[0;35m";
+my $COLOR_ERR = "\e[1;31m";
+my $COLOR_NAME = "\e[0;34m";
+my $COLOR_FILE = "\e[1;35m";
+
+
+my @dirs = qw(build);
 my %targets;
+
+
+sub configure
+{
+	print "${COLOR_CMD}configuring $COLOR_NAME$name $COLOR_VER$ver\n$COLOR_RST";
+	&gen_dep("src");
+	&write_makefile;
+}
+
 
 sub gen_dep
 {
-	my ($dir) = @_;
-	return if $dir =~ /\/build$/;
+	my $dir = shift;
+	return if $dir =~ /build$/;
+	my $parent = shift || "..";
 
 	push @dirs, "build/$dir";
-	print "\e[0;32mprocessing \e[0;35m$dir/\n\e[0m";
+	print "${COLOR_CMD}processing $COLOR_DIR$dir/\n$COLOR_RST";
+	&write_forwarding_makefile($dir, $parent);
 
 	for (<$dir/*.cc>) {
-		print "\e[0;32mprocessing \e[1;35m$_\n\e[1;31m";
-		my $deps = `gcc $CCFLAGS -MM "$_"` or die "\e[0m";
-		print "\e[0m";
+		print "${COLOR_CMD}processing $COLOR_FILE$_\n$COLOR_ERR";
+		my $deps = `$CC $CCFLAGS -MM "$_"` or die $COLOR_RST;
+		print $COLOR_RST;
 		$deps =~ /^([^:]+):((.|\n)*)\n$/m or die;
 		my $target = $1;
 		my $dep = $2;
@@ -40,9 +62,32 @@ sub gen_dep
 
 	for (<$dir/*/>) {
 		s|/$||;
-		&gen_dep($_);
+		&gen_dep($_, "$parent/..");
 	}
 }
+
+
+sub write_forwarding_makefile
+{
+	my ($dir, $parent) = @_;
+	open my $makefile, ">", "$dir/makefile" or die;
+	print $makefile <<EOF;
+# vim: noet ts=4 sw=4 sts=0 fenc=utf8
+# License: The MIT License with modification. See LICENSE for details.
+# (C) 2014-2015. Giumo Xavier Clanjor (哆啦比猫/兰威举) <cjxgm\@126.com>
+
+.PHONY: \${MAKECMDGOALS}
+
+all \$(filter-out all,\${MAKECMDGOALS}): .forward
+	@# no op
+
+.forward:
+	\@\${MAKE} --no-print-directory -C $parent \${MAKECMDGOALS} || true
+
+EOF
+	close $makefile
+}
+
 
 sub write_makefile
 {
@@ -51,86 +96,113 @@ sub write_makefile
 # vim: noet ts=4 sw=4 sts=0 fenc=utf8
 # License: The MIT License with modification. See LICENSE for details.
 # (C) 2014-2015. Giumo Xavier Clanjor (哆啦比猫/兰威举) <cjxgm\@126.com>
+VERSION = $ver
+BUNDLE = $name-\$(VERSION)
 
+# compiler and flags
 CXX = $CC
 LD = \$(CXX)
 CCFLAGS = $CCFLAGS
 LDFLAGS = $LDFLAGS
-
-ifdef LOG
-CCFLAGS += -DLOG=\$(LOG)
-endif
 
 EOF
 	print $makefile "CCFLAGS += `pkg-config --cflags $_`\n" for @libs;
 	print $makefile "LDFLAGS += `pkg-config --libs   $_`\n" for @libs;
 	print $makefile <<EOF;
 
-.PHONY: all clean cleanall rebuild reconf test bundle commit install uninstall analyze
 
+# named colors
+COLOR_RST = $COLOR_RST
+COLOR_CMD = $COLOR_CMD
+COLOR_ARG = $COLOR_FILE
+
+
+# phonies
+.PHONY: all release-all clean cleanall rebuild release reconf test bundle commit analyze diff log install uninstall
 all: init app
+release-all: CCFLAGS += -DRELEASE
+release-all: all
 clean: makefile
-	\@echo -e "\e[0;32mcleaning\e[0m"
+	\@echo "\$(COLOR_CMD)cleaning\$(COLOR_RST)"
 	rm -rf build
-	rm -f $dest
-	rm -rf bundle
+	rm -rf \$(BUNDLE)
 cleanall: clean
-	rm -f makefile
-rebuild: clean all
+	rm -f `find . -name 'makefile'`
+	rm -f $dest
+	rm -rf $name-*
+rebuild:
+	\$(MAKE) --no-print-directory clean
+	\$(MAKE) --no-print-directory all
+release:
+	\$(MAKE) --no-print-directory clean
+	\$(MAKE) --no-print-directory release-all
 reconf:
-	\@echo -e "\e[0;32mreconfiguring\e[0m"
+	\@echo "\$(COLOR_CMD)reconfiguring\$(COLOR_RST)"
 	./configure
-test: all
-	\@echo -e "\e[0;32mtesting" "\e[1;35m$name\e[0m"
+test: all uninstall
+	\@echo "\$(COLOR_CMD)testing" "\$(COLOR_ARG)$name\$(COLOR_RST)"
+	mkdir -p ~/.vim/bundle/
+	cp -r vim/ ~/.vim/bundle/$name/
+	mkdir -p ~/.vim/bundle/$name/lib/
+	cp $dest ~/.vim/bundle/$name/lib/
 	$test
 commit: cleanall
 	git add .
 	git diff --cached
 	env LANG=C git commit -a || true
 	./configure
-bundle: all
-	\@echo -e "\e[0;32mbundling" "\e[1;35m$name\e[0m"
-	rm -rf bundle/
-	cp -r vim/ bundle/
-	mkdir -p bundle/lib/
-	cp $dest bundle/lib/$dest
-	cp README.md bundle/
-	cp LICENSE* bundle/
+bundle: release
+	\@echo "\$(COLOR_CMD)bundling" "\$(COLOR_ARG)$name\$(COLOR_RST)"
+	rm -rf \$(BUNDLE)
+	cp -r vim/  \$(BUNDLE)
+	mkdir -p \$(BUNDLE)/lib/
+	cp $dest \$(BUNDLE)/lib/
+	cp README.md \$(BUNDLE)/
+	cp LICENSE* \$(BUNDLE)/
 install: bundle uninstall
-	\@echo -e "\e[0;32minstalling" "\e[1;35m$name\e[0m"
+	\@echo -e "\$(COLOR_CMD)installing" "\$(COLOR_ARG)$name\$(COLOR_RST)"
 	mkdir -p ~/.vim/bundle/
-	cp -r bundle/ ~/.vim/bundle/vimlight/
+	cp -r \$(BUNDLE)/ ~/.vim/bundle/$name/
 uninstall:
-	\@echo -e "\e[0;32muninstalling" "\e[1;35m$name\e[0m"
-	rm -rf ~/.vim/bundle/vimlight/
+	\@echo -e "\$(COLOR_CMD)uninstalling" "\$(COLOR_ARG)$name\$(COLOR_RST)"
+	rm -rf ~/.vim/bundle/$name/
 analyze: clean
+	\@echo "\$(COLOR_CMD)analyzing" "\$(COLOR_ARG)$name\$(COLOR_RST)"
 	scan-build -V --use-c++=$CC make
+diff:
+	git diff --cached
+log:
+	git log --oneline --graph --decorate
 
+
+# build rules
 init: makefile build @dirs
 app: makefile $dest
 makefile: configure
-	\@echo -e "\e[0;32mreconfiguring\e[0m"
+	\@echo "\$(COLOR_CMD)reconfiguring\$(COLOR_RST)"
 	./configure
-build:
-	\@echo -e "\e[0;32mmaking" "\e[1;35mdirectories\e[0m"
-	mkdir -p build
 EOF
-	print $makefile "$_:\n\tmkdir -p $_\n" for @dirs;
-	print $makefile "\n";
-	print $makefile <<EOF for keys %targets;
-$_:$targets{$_} makefile
-	\@echo -e "\e[0;32mcompiling" "\e[1;35m\$@\e[0m"
-	\$(CXX) -c -o \$@ \$< \$(CCFLAGS)
+	print $makefile <<EOF for @dirs;
+$_:
+	\@echo "\$(COLOR_CMD)making directory" "\$(COLOR_ARG)\$@\$(COLOR_RST)"
+	mkdir -p $_
 EOF
 	print $makefile <<EOF;
+build/%.o: %.cc
+	\@echo "\$(COLOR_CMD)compiling" "\$(COLOR_ARG)\$@\$(COLOR_RST)"
+	\$(CXX) -c -o \$@ \$< \$(CCFLAGS)
 $dest: @{[keys %targets]}
-	\@echo -e "\e[0;32mlinking" "\e[1;35m\$@\e[0m"
+	\@echo "\$(COLOR_CMD)linking" "\$(COLOR_ARG)\$@\$(COLOR_RST)"
 	\$(LD) -o \$@ \$^ \$(LDFLAGS)
 
+
+# dependencies
 EOF
+	print $makefile "$_:$targets{$_} makefile\n" for keys %targets;
+	print $makefile "\n";
 	close $makefile
 }
 
-&gen_dep("src");
-&write_makefile;
+
+&configure;
 

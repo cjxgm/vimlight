@@ -36,7 +36,7 @@ namespace clang
 		{
 			using value_type = VALUE;
 			using self = unique;
-			using super = bin<value_type>;
+			using super = bin<VALUE>;
 			using deleter_type = std::function<void(value_type)>;
 
 			unique(deleter_type d) : owned(false), deleter(d) {}
@@ -55,6 +55,7 @@ namespace clang
 			{
 				other.owned = false;
 			}
+
 			self& operator=(self&& other)
 			{
 				delete_if_owned();
