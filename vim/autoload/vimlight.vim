@@ -143,6 +143,8 @@ lua <<END
 			local h = vim.eval[[&lines]]
 			cmd_env.view(y, h)
 		end
+
+		return vl
 	end
 
 	local root = vim.eval[[expand("<sfile>:h:h")]]
