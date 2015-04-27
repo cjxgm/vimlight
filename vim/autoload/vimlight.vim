@@ -99,7 +99,9 @@ lua <<END
 		end
 
 		vl.finish = function()
-			while not done do fetch() end
+			while not done do
+				vl.fetch()
+			end
 		end
 
 		vl.update = function()
