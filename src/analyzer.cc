@@ -124,7 +124,7 @@ namespace vimlight
 				}
 
 				// function call
-				else if (kind == "CallExpr" && ref_kind != "CXXConstructor") {
+				else if (kind == "CallExpr" && ref_kind != "CXXConstructor" && !is_operator(name)) {
 					auto oc = cursor.first_child();
 					if (oc) {
 						auto fc = oc.get();
@@ -134,7 +134,8 @@ namespace vimlight
 									fc_kind == "UnexposedExpr") &&
 								(fc_ref_kind == "FunctionDecl" ||
 									fc_ref_kind == "CXXMethod" ||
-									fc_ref_kind == "CXXDestructor")) {
+									fc_ref_kind == "CXXDestructor" ||
+									fc_ref_kind == "VarDecl")) {
 							auto kind = group.at("function_call");
 							auto pos = fc.location().position();
 							int name_size = identifier_length(fc.name());
