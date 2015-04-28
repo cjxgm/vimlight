@@ -2,6 +2,7 @@
 #include "log.hh"
 #include <utility>
 #include <string>
+#include <algorithm>
 
 namespace
 {
@@ -11,6 +12,15 @@ namespace
 				('A' <= c && c <= 'Z') ||
 				('0' <= c && c <= '9') ||
 				c == '_' || c == '$');
+	}
+
+	int identifier_length(std::string const& x)
+	{
+		if (x.empty()) return 0;
+		auto first = begin(x);
+		if (*first == '~') ++first;
+		auto it = std::find_if_not(first, end(x), is_identifier);
+		return it - begin(x);
 	}
 
 	bool is_operator(std::string const& x)
@@ -123,10 +133,11 @@ namespace vimlight
 						if ((fc_kind == "MemberRefExpr" ||
 									fc_kind == "UnexposedExpr") &&
 								(fc_ref_kind == "FunctionDecl" ||
-									fc_ref_kind == "CXXMethod")) {
+									fc_ref_kind == "CXXMethod" ||
+									fc_ref_kind == "CXXDestructor")) {
 							auto kind = group.at("function_call");
 							auto pos = fc.location().position();
-							int name_size = fc.name().size();
+							int name_size = identifier_length(fc.name());
 							list.push_back({ pos.y, pos.x, pos.y, pos.x+name_size, kind });
 							log << "\t\t" << kind << " (function call)\n";
 						}
@@ -136,10 +147,12 @@ namespace vimlight
 				// function declaration
 				else if (kind == "FunctionDecl" ||
 						kind == "FunctionTemplate" ||
-						kind == "CXXMethod") {
+						kind == "CXXMethod" ||
+						kind == "CXXConstructor" ||
+						kind == "CXXDestructor") {
 					if (!is_operator(name)) {
 						auto kind = group.at("function_decl");
-						int name_size = name.size();
+						int name_size = identifier_length(name);
 						list.push_back({ pos.y, pos.x, pos.y, pos.x+name_size, kind });
 						log << "\t\t" << kind << " (function declaration)\n";
 					}
