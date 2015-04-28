@@ -4,8 +4,11 @@
 #include "range.hh"
 #include "location.hh"
 #include "string.hh"
+#include "../meta/optional.hh"
 #include <string>
 #include <functional>
+#include <memory>
+
 
 namespace clang
 {
@@ -41,6 +44,18 @@ namespace clang
 		kind kind() const { return c::cursor::get_kind(get()); }
 		name_type name() const { return clang::string{c::cursor::get_spelling(get())}; }
 		cursor reference() const { return clang::cursor{c::cursor::get_referenced((get()))}; }
+		auto first_child() const
+		{
+			using optional_cursor = meta::optional<cursor>;
+			optional_cursor oc;
+			c::cursor::childs::visit(get(),
+					[] (auto cs, auto, auto data) {
+						auto& oc = *reinterpret_cast<optional_cursor*>(data);
+						oc = cursor{cs};
+						return c::cursor::childs::visit_result::stop;
+					}, &oc);
+			return std::move(oc);
+		}
 
 		identifier_type identifier() const
 		{

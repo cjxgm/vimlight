@@ -1,6 +1,8 @@
 #include "analyzer.hh"
 #include "log.hh"
 #include <utility>
+#include <string>
+#include <algorithm>
 
 namespace
 {
@@ -11,7 +13,27 @@ namespace
 				('0' <= c && c <= '9') ||
 				c == '_' || c == '$');
 	}
+
+	int identifier_length(std::string const& x)
+	{
+		if (x.empty()) return 0;
+		auto first = begin(x);
+		if (*first == '~') ++first;
+		auto it = std::find_if_not(first, end(x), is_identifier);
+		return it - begin(x);
+	}
+
+	bool is_operator(std::string const& x)
+	{
+		constexpr auto op = "operator";
+		constexpr auto op_size = sizeof(op);
+		static_assert(op_size == 8, "portability issue?");
+		if (x.size() <= op_size) return false;
+		if (x.substr(0, op_size) != op) return false;
+		return !is_identifier(x[op_size]);
+	}
 }
+
 
 namespace vimlight
 {
@@ -101,114 +123,38 @@ namespace vimlight
 					log << "\t\t" << kind << " (initializer list braces)\n";
 				}
 
-				// special function/static member call
-				else if (kind == "DeclRefExpr" && (
-							ref_kind == "FunctionDecl" ||
-							ref_kind == "CXXMethod")) {
-					int extent = tail_pos.x - head_pos.x;
-					int name_size = name.size();
-					static const std::string op{"operator"};
-					int op_size = op.size();
-					bool is_operator = (
-							name_size > op_size &&
-							name.substr(0, op_size) == op &&
-							!is_identifier(name[op_size]));
-
-					/* call operator function implicitly
-
-						000000000011111111
-						012345678901234567
-						x["abcdeasdasd"];
-
-						is_operator: true
-						name: operator[]
-						name_size: 10
-						op_size: 8
-						real_size: 10 - 8 = 2
-						pos: 01
-						head_pos: 01
-						tail_pos: 17
-						extent: 17 - 01 =16
-					*/
-					if (is_operator) {
-						auto kind = group.at("operator_call");
-						int real_size = name_size - op_size;
-						if (real_size == 2) {
-							list.push_back({
-									head_pos.y, head_pos.x,
-									head_pos.y, head_pos.x+1,
-									kind });
-							list.push_back({
-									tail_pos.y, tail_pos.x-1,
-									tail_pos.y, tail_pos.x,
-									kind });
+				// function call
+				else if (kind == "CallExpr" && ref_kind != "CXXConstructor") {
+					auto oc = cursor.first_child();
+					if (oc) {
+						auto fc = oc.get();
+						auto fc_kind = fc.kind().name();
+						auto fc_ref_kind = fc.reference().kind().name();
+						if ((fc_kind == "MemberRefExpr" ||
+									fc_kind == "UnexposedExpr") &&
+								(fc_ref_kind == "FunctionDecl" ||
+									fc_ref_kind == "CXXMethod" ||
+									fc_ref_kind == "CXXDestructor")) {
+							auto kind = group.at("function_call");
+							auto pos = fc.location().position();
+							int name_size = identifier_length(fc.name());
+							list.push_back({ pos.y, pos.x, pos.y, pos.x+name_size, kind });
+							log << "\t\t" << kind << " (function call)\n";
 						}
-						else list.push_back({
-								head_pos.y, head_pos.x,
-								tail_pos.y, tail_pos.x,
-								kind });
-						log << "\t\t" << kind << " (operator call)\n";
-					}
-
-					/* surrounded function call
-
-						a function name may be surrounded by:
-						1.	namespace/struct name then "::"
-						3.	template arguments with "<>" around them
-
-						0000000000111111111122222
-						0123456789012345678901234
-						foo::bar<baz>(123, 456);
-						`----+-------+--- head_pos
-						     |       `--- tail_pos
-						`----+-------'--- extent
-						     `----------- pos
-
-						is_operator: false
-						name: bar
-						name_size: 3
-						pos: 05
-						head_pos: 00
-						tail_pos: 13
-						extent: 13 - 00 = 13
-					*/
-					else if (name_size < extent) {
-						auto kind = group.at("special_function_call");
-						list.push_back({ pos.y, pos.x, pos.y, pos.x+name_size, kind });
-						log << "\t\t" << kind << " (special function call)\n";
 					}
 				}
 
-				// special member call
-				else if (kind == "MemberRefExpr" && ref_kind == "CXXMethod") {
-					int name_size = name.size();
-
-					/* surrounded member call
-
-						a function name may be surrounded by:
-						1.	object name then "."
-						3.	template arguments with "<>" around them
-
-						000000000011111111112222
-						012345678901234567890123
-						foo.bar<baz>(123, 456);
-						`---+-------+--- head_pos
-						    |       `--- tail_pos
-						`---+-------'--- extent
-						    `----------- pos
-
-						name: bar
-						name_size: 3
-						pos: 04
-						head_pos: 00
-						tail_pos: 12
-						extent: 12 - 00 = 12
-					*/
-					// FIXME: multi-line not supported.
-					if (pos.x + name_size < tail_pos.x) {
-						auto kind = group.at("special_member_call");
+				// function declaration
+				else if (kind == "FunctionDecl" ||
+						kind == "FunctionTemplate" ||
+						kind == "CXXMethod" ||
+						kind == "CXXConstructor" ||
+						kind == "CXXDestructor") {
+					if (!is_operator(name)) {
+						auto kind = group.at("function_decl");
+						int name_size = identifier_length(name);
 						list.push_back({ pos.y, pos.x, pos.y, pos.x+name_size, kind });
-						log << "\t\t" << kind << " (special member call)\n";
+						log << "\t\t" << kind << " (function declaration)\n";
 					}
 				}
 
