@@ -20,6 +20,10 @@ namespace
 	{
 		if (!c.range().head().is_from_main()) return;
 
+		auto ref = c.reference();
+		auto ref_kind = ref.kind().name();
+		auto ref_name = ref.name();
+
 		auto range = c.range();
 		auto head = range.head().position();
 		auto tail = range.tail().position();
@@ -29,11 +33,14 @@ namespace
 		auto id = c.identifier();
 		replace(name, "\\", "\\\\");
 		replace(name, "\"", "\\\"");
+		replace(ref_name, "\"", "\\\"");
 		dot << "\n\t\"" << id << "\" [label=\""
 			<< "[" << kind << "] \\\"" << name << "\\\"\\n"
 			<< head.y << ", " << head.x << " -> "
 			<< tail.y << ", " << tail.x << " @ "
-			<< loc.y << ", " << loc.x << "\"]\n";
+			<< loc.y << ", " << loc.x << "\\n"
+			<< "[" << ref_kind << "] \\\"" << ref_name << "\\\""
+			<< "\"]\n";
 
 		c.each_child([&dot, &id](clang::cursor c) {
 			if (!c.range().head().is_from_main()) return false;
