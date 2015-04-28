@@ -25,9 +25,8 @@ namespace
 
 	bool is_operator(std::string const& x)
 	{
-		constexpr auto op = "operator";
-		constexpr auto op_size = sizeof(op);
-		static_assert(op_size == 8, "portability issue?");
+		constexpr auto& op = "operator";
+		constexpr auto op_size = sizeof(op)-1;	// -1 for trailing '\0'
 		if (x.size() <= op_size) return false;
 		if (x.substr(0, op_size) != op) return false;
 		return !is_identifier(x[op_size]);
