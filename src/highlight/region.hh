@@ -1,6 +1,5 @@
 #pragma once
 #include "type.hh"
-#include <initializer_list>
 
 namespace vimlight
 {

@@ -1,9 +1,6 @@
 #include "analyzer.hh"
 #include "../log.hh"
 #include "rules.hh"
-#include <utility>
-#include <string>
-#include <algorithm>
 
 namespace vimlight
 {
