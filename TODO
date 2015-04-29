@@ -1,20 +1,3 @@
 
-* each highlight rule is a type:
-	static constexpr auto group();
-	static bool applicable();
-	static region highlight();
-
-* typelist of rules
-	using rules = std::tuple<function_decl, function_call, ...>;
-
-* parse:
-	for each cursor {
-		for each rule in rules
-			if (group.has(rule::group()) && rule::applicable(...))
-				highlight(group[rule::group()], rule::highlight(...));
-
-		if (group.has(kind))
-			highlight(group[kind], region{...});
-	}
-
+* finish all rules
 
