@@ -31,6 +31,13 @@ namespace
 		auto kind = c.kind().name();
 		auto name = c.name();
 		auto id = c.identifier();
+
+		auto oc = c.first_child();
+		bool highlight = (kind == "CallExpr") &&
+			oc && oc.get().reference().kind().name() != "InvalidFile" &&
+			ref_kind != "InvalidFile" &&
+			(name.size() < 8 ? true : name.substr(0, 8) != "operator");
+
 		replace(name, "\\", "\\\\");
 		replace(name, "\"", "\\\"");
 		replace(ref_name, "\"", "\\\"");
@@ -39,8 +46,8 @@ namespace
 			<< head.y << ", " << head.x << " -> "
 			<< tail.y << ", " << tail.x << " @ "
 			<< loc.y << ", " << loc.x << "\\n"
-			<< "[" << ref_kind << "] \\\"" << ref_name << "\\\""
-			<< "\"]\n";
+			<< "[" << ref_kind << "] \\\"" << ref_name << "\\\"" << "\""
+			<< (highlight ? " color=red fontcolor=red" : "") << "]\n";
 
 		c.each_child([&dot, &id](clang::cursor c) {
 			if (!c.range().head().is_from_main()) return false;

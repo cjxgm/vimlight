@@ -25,9 +25,8 @@ namespace
 
 	bool is_operator(std::string const& x)
 	{
-		constexpr auto op = "operator";
-		constexpr auto op_size = sizeof(op);
-		static_assert(op_size == 8, "portability issue?");
+		constexpr auto& op = "operator";
+		constexpr auto op_size = sizeof(op)-1;	// -1 for trailing '\0'
 		if (x.size() <= op_size) return false;
 		if (x.substr(0, op_size) != op) return false;
 		return !is_identifier(x[op_size]);
@@ -124,7 +123,10 @@ namespace vimlight
 				}
 
 				// function call
-				else if (kind == "CallExpr" && ref_kind != "CXXConstructor") {
+				else if (kind == "CallExpr" &&
+						ref_kind != "CXXConstructor" &&
+						ref_kind != "InvalidFile" &&
+						!is_operator(name)) {
 					auto oc = cursor.first_child();
 					if (oc) {
 						auto fc = oc.get();
@@ -134,7 +136,8 @@ namespace vimlight
 									fc_kind == "UnexposedExpr") &&
 								(fc_ref_kind == "FunctionDecl" ||
 									fc_ref_kind == "CXXMethod" ||
-									fc_ref_kind == "CXXDestructor")) {
+									fc_ref_kind == "CXXDestructor" ||
+									fc_ref_kind == "VarDecl")) {
 							auto kind = group.at("function_call");
 							auto pos = fc.location().position();
 							int name_size = identifier_length(fc.name());
@@ -193,7 +196,7 @@ namespace vimlight
 			return true;
 		});
 
-		return std::move(list);
+		return list;
 	}
 }
 

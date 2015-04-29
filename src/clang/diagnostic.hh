@@ -31,7 +31,7 @@ namespace clang
 			rs.reserve(size);
 			for (auto i=0u; i<size; i++)
 				rs.emplace_back(c::diagnostic::get_range(get(), i));
-			return std::move(rs);
+			return rs;
 		}
 
 		diagnostics_type childs()
