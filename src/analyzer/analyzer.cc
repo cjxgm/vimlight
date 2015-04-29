@@ -72,7 +72,7 @@ namespace vimlight
 				if (!loc.is_from_main()) continue;
 
 				auto pos =  loc.position();
-				vim.highlight(group.at("error"), { pos.y, pos.x, 1 });
+				vim.highlight(group.at(":error"), { pos.y, pos.x, 1 });
 				log << "\t\t" << pos.y << ", " << pos.x << '\n';
 
 				auto ranges = diag.ranges();
@@ -83,7 +83,7 @@ namespace vimlight
 					auto head_pos =       head  .position();
 					auto tail_pos = range.tail().position();
 
-					vim.highlight(group.at("error_range"), { head_pos.y, head_pos.x, 1 });
+					vim.highlight(group.at(":error_range"), { head_pos.y, head_pos.x, 1 });
 					log << "\t\t" << head_pos.y << ", " << head_pos.x
 						<< " -> " << tail_pos.y << ", " << tail_pos.x
 						<< "\n";

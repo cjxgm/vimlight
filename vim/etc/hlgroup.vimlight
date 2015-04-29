@@ -2,7 +2,7 @@
 # highlight group definition file
 #
 # left hand side:
-#		output from clang or the analyzer
+#		output from clang look-like-this or the analyzer :look-like-this
 #
 # right hand side:
 #		highlight group in vim.
@@ -14,11 +14,11 @@ namespace-ref			special		# namespace
 template-ref			label		# template
 overloaded-decl-ref		signcolumn	# unresolved function ref (because of overloading and templating)
 variable-ref			underlined	# variable name in lambda's capture list
-error					error		# error
-error-range				error		# error range
-init-list-brace			define		# initializer list's brace
-function-call			function	# highlight function call
-function-decl			function	# highlight function declaration
+:error					error		# error
+:error-range			error		# error range
+:init-list-brace		define		# initializer list's brace
+:function-call			function	# highlight function call
+:function-decl			function	# highlight function declaration
 
 # FIXME: not everyone like them?
 #member				visualnos

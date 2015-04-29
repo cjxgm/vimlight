@@ -8,7 +8,7 @@ namespace vimlight
 		// function call
 		struct function_call
 		{
-			static constexpr auto group() { return "function-call"; }
+			static constexpr auto group() { return ":function-call"; }
 
 			static bool applicable(cursor_cref c)
 			{

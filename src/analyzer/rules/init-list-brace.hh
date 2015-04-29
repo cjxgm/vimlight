@@ -8,7 +8,7 @@ namespace vimlight
 		// braces of trivial initializer list
 		struct init_list_brace
 		{
-			static constexpr auto group() { return "init-list-brace"; }
+			static constexpr auto group() { return ":init-list-brace"; }
 
 			static bool applicable(cursor_cref c)
 			{
