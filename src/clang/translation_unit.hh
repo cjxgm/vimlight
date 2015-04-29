@@ -65,7 +65,7 @@ namespace clang
 					diags.emplace_back(std::move(d));
 			}
 
-			return std::move(diags);
+			return diags;
 		}
 
 		void visualize()

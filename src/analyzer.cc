@@ -123,7 +123,10 @@ namespace vimlight
 				}
 
 				// function call
-				else if (kind == "CallExpr" && ref_kind != "CXXConstructor" && !is_operator(name)) {
+				else if (kind == "CallExpr" &&
+						ref_kind != "CXXConstructor" &&
+						ref_kind != "InvalidFile" &&
+						!is_operator(name)) {
 					auto oc = cursor.first_child();
 					if (oc) {
 						auto fc = oc.get();
@@ -193,7 +196,7 @@ namespace vimlight
 			return true;
 		});
 
-		return std::move(list);
+		return list;
 	}
 }
 
