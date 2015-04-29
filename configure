@@ -139,7 +139,8 @@ release:
 reconf:
 	\@echo "\$(COLOR_CMD)reconfiguring\$(COLOR_RST)"
 	./configure
-test: all uninstall
+test: all
+	\$(MAKE) --no-print-directory uninstall
 	\@echo "\$(COLOR_CMD)testing" "\$(COLOR_ARG)$name\$(COLOR_RST)"
 	mkdir -p ~/.vim/bundle/
 	cp -r vim/ ~/.vim/bundle/$name/
@@ -157,7 +158,8 @@ bundle: release
 	cp $dest \$(BUNDLE)/lib/
 	cp README.md \$(BUNDLE)/
 	cp LICENSE* \$(BUNDLE)/
-install: bundle uninstall
+install: bundle
+	\$(MAKE) --no-print-directory uninstall
 	\@echo -e "\$(COLOR_CMD)installing" "\$(COLOR_ARG)$name\$(COLOR_RST)"
 	mkdir -p ~/.vim/bundle/
 	cp -r \$(BUNDLE)/ ~/.vim/bundle/$name/
