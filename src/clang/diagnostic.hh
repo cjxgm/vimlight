@@ -11,7 +11,7 @@
 
 namespace clang
 {
-	struct diagnostic : public resource::unique<c::diagnostic::type>
+	struct diagnostic : resource::unique<c::diagnostic::type>
 	{
 		using self_type = diagnostic;
 		using super_type = unique;

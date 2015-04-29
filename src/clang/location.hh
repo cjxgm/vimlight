@@ -6,7 +6,7 @@
 
 namespace clang
 {
-	struct location : public resource::bin<c::location::type>
+	struct location : resource::bin<c::location::type>
 	{
 		using self_type = location;
 		using super_type = bin;
