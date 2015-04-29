@@ -14,7 +14,7 @@ namespace clang
 		for (auto i=0u; i<size; i++)
 			diags.emplace_back(c::diagnostic::set::get(get(), i));
 
-		return std::move(diags);
+		return diags;
 	}
 }
 

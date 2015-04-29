@@ -54,7 +54,7 @@ namespace clang
 						oc = cursor{cs};
 						return c::cursor::childs::visit_result::stop;
 					}, &oc);
-			return std::move(oc);
+			return oc;
 		}
 
 		identifier_type identifier() const
