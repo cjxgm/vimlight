@@ -23,6 +23,7 @@ namespace vimlight
 				if (it == end(g)) return false;
 				if (!U::applicable(c)) return false;
 
+				log << "\t\t<" << U::group() << ">\n";
 				auto& kind = it->second;
 				for (auto& region: U::apply(c))
 					vim.highlight(kind, region);
@@ -109,52 +110,6 @@ namespace vimlight
 			analyze(c, group, vim);
 #if 0
 			try {
-				// braces of trivial initializer list
-				if (kind == "InitListExpr") {
-					kind = group.at("init_list_brace");
-					log << "\t[init_list_brace]\n"
-						<< "\t\t" << head_pos.y << ", " << head_pos.x
-						<< " -> " << head_pos.y << ", " << head_pos.x+1
-						<< '\n'
-						<< "\t\t" << tail_pos.y << ", " << tail_pos.x-1
-						<< " -> " << tail_pos.y << ", " << tail_pos.x
-						<< '\n';
-					list.push_back({
-							head_pos.y, head_pos.x,
-							head_pos.y, head_pos.x+1,
-							kind });
-					list.push_back({
-							tail_pos.y, tail_pos.x-1,
-							tail_pos.y, tail_pos.x,
-							kind });
-					log << "\t\t" << kind << " (initializer list braces)\n";
-				}
-
-				// function call
-				else if (kind == "CallExpr" &&
-						ref_kind != "CXXConstructor" &&
-						ref_kind != "InvalidFile" &&
-						!is_operator(name)) {
-					auto oc = c.first_child();
-					if (oc) {
-						auto fc = oc.get();
-						auto fc_kind = fc.kind().name();
-						auto fc_ref_kind = fc.reference().kind().name();
-						if ((fc_kind == "MemberRefExpr" ||
-									fc_kind == "UnexposedExpr") &&
-								(fc_ref_kind == "FunctionDecl" ||
-									fc_ref_kind == "CXXMethod" ||
-									fc_ref_kind == "CXXDestructor" ||
-									fc_ref_kind == "VarDecl")) {
-							auto kind = group.at("function_call");
-							auto pos = fc.location().position();
-							int name_size = identifier_length(fc.name());
-							list.push_back({ pos.y, pos.x, pos.y, pos.x+name_size, kind });
-							log << "\t\t" << kind << " (function call)\n";
-						}
-					}
-				}
-
 				// function declaration
 				else if (kind == "FunctionDecl" ||
 						kind == "FunctionTemplate" ||

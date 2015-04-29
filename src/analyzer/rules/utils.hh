@@ -31,6 +31,21 @@ namespace vimlight
 			if (x.substr(0, op_size) != op) return false;
 			return !is_identifier(x[op_size]);
 		}
+
+
+		template <class U, class V>
+		inline bool is_one_of(U const& y, V const& z)
+		{
+			return (y == z);
+		}
+
+		template <class U, class V, class T, class ...TS>
+		inline bool is_one_of(U const& y, V const& z,
+				T const& x, TS const&... xs)
+		{
+			return (is_one_of(y, z       ) ||
+					is_one_of(y, x, xs...));
+		}
 	}
 }
 

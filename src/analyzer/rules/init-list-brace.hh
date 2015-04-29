@@ -5,6 +5,7 @@ namespace vimlight
 {
 	namespace analyzer_rules
 	{
+		// braces of trivial initializer list
 		struct init_list_brace
 		{
 			static constexpr auto group() { return "init-list-brace"; }
