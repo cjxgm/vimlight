@@ -4,7 +4,6 @@
 #include <utility>
 #include <string>
 #include <algorithm>
-#include <typeinfo>
 
 namespace vimlight
 {
@@ -108,54 +107,6 @@ namespace vimlight
 				<< "\t\t\t{" << ref.file() << "}\n";
 
 			analyze(c, group, vim);
-#if 0
-			try {
-				// function declaration
-				else if (kind == "FunctionDecl" ||
-						kind == "FunctionTemplate" ||
-						kind == "CXXMethod" ||
-						kind == "CXXConstructor" ||
-						kind == "CXXDestructor") {
-					if (!is_operator(name)) {
-						auto kind = group.at("function_decl");
-						int name_size = identifier_length(name);
-						list.push_back({ pos.y, pos.x, pos.y, pos.x+name_size, kind });
-						log << "\t\t" << kind << " (function declaration)\n";
-					}
-				}
-
-				// parameters in lambdas capture
-				else if (kind == "DeclRefExpr" && ref_kind == "ParmDecl") {
-					auto kind = group.at("parameter");
-					list.push_back({
-							head_pos.y, head_pos.x,
-							tail_pos.y, tail_pos.x,
-							kind });
-					log << "\t\t" << kind << " (parameter)\n";
-				}
-
-				// member/field
-				else if (kind == "MemberRefExpr" && ref_kind == "FieldDecl") {
-					auto kind = group.at("member");
-					list.push_back({
-							tail_pos.y, tail_pos.x-int(name.size()),
-							tail_pos.y, tail_pos.x,
-							kind });
-					log << "\t\t" << kind << " (member)\n";
-				}
-
-				// other range
-				else {
-					list.push_back({
-							head_pos.y, head_pos.x,
-							tail_pos.y, tail_pos.x,
-							group.at(kind) });
-					log << "\t\t" << group.at(kind) << " (" << kind << ")\n";
-				}
-				return true;
-			}
-			catch (std::out_of_range) {}
-#endif
 
 			return true;
 		});
