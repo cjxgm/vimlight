@@ -5,10 +5,10 @@ namespace vimlight
 {
 	namespace analyzer_rules
 	{
-		// parameters in lambda's capture
-		struct capture_parameter
+		// parameters
+		struct parameter
 		{
-			static constexpr auto group() { return ":capture-parameter"; }
+			static constexpr auto group() { return ":parameter"; }
 
 			static bool applicable(cursor_cref c)
 			{
