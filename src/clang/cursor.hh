@@ -4,6 +4,7 @@
 #include "range.hh"
 #include "location.hh"
 #include "string.hh"
+#include "utils.hh"
 #include "../meta/optional.hh"
 #include "../meta/constraints.hh"
 #include <string>
@@ -28,16 +29,18 @@ namespace clang
 			: super_type(value)
 			, _range{c::cursor::get_extent(value)}
 			, _loc{c::cursor::get_location(value)}
-			, kind{clang::string{c::cursor::kind::get_spelling(c::cursor::get_kind(value))}}
+			, kind{uncamel(clang::string{c::cursor::kind::get_spelling(c::cursor::get_kind(value))})}
 			, name{clang::string{c::cursor::get_spelling(value)}}
-			, is_from_main{_loc.is_from_main()}
+			, is_from_main{_range.head().is_from_main()}
 			, pos(_loc.position())
 			, head(_range.head().position())
 			, tail(_range.tail().position())
 		{
 		}
 
-		cursor reference() const { return clang::cursor{c::cursor::get_referenced((get()))}; }
+		auto file() const { return _loc.file(); }
+		auto reference() const { return clang::cursor{c::cursor::get_referenced((get()))}; }
+
 		auto first_child() const
 		{
 			using optional_cursor = meta::optional<cursor>;
