@@ -12,8 +12,6 @@ namespace vimlight
 			coord_type x;
 			coord_type w;
 		};
-
-		using regions = std::initializer_list<region>;
 	}
 }
 

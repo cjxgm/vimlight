@@ -1,46 +1,62 @@
 #include "analyzer.hh"
-#include "log.hh"
+#include "../log.hh"
+#include "rules.hh"
 #include <utility>
 #include <string>
 #include <algorithm>
-
-namespace
-{
-	bool is_identifier(char c)
-	{
-		return (('a' <= c && c <= 'z') ||
-				('A' <= c && c <= 'Z') ||
-				('0' <= c && c <= '9') ||
-				c == '_' || c == '$');
-	}
-
-	int identifier_length(std::string const& x)
-	{
-		if (x.empty()) return 0;
-		auto first = begin(x);
-		if (*first == '~') ++first;
-		auto it = std::find_if_not(first, end(x), is_identifier);
-		return it - begin(x);
-	}
-
-	bool is_operator(std::string const& x)
-	{
-		constexpr auto& op = "operator";
-		constexpr auto op_size = sizeof(op)-1;	// -1 for trailing '\0'
-		if (x.size() <= op_size) return false;
-		if (x.substr(0, op_size) != op) return false;
-		return !is_identifier(x[op_size]);
-	}
-}
-
+#include <typeinfo>
 
 namespace vimlight
 {
-	auto analyzer::parse(
-			source_type const& src,
-			 group_type const& group) -> list_type
+	namespace
 	{
-		list_type list;
+		using  group_cref = analyzer::group_cref;
+		using     vim_ref = analyzer::vim_ref;
+		using cursor_cref = clang::cursor const&;
+
+		namespace analyze_impl
+		{
+			template <class U>
+			bool analyze(cursor_cref c, group_cref g, vim_ref vim)
+			{
+				auto it = g.find(U::group());
+				if (it == end(g)) return false;
+				if (!U::applicable(c)) return false;
+
+				auto& kind = it->second;
+				for (auto& region: U::apply(c))
+					vim.highlight(kind, region);
+				return true;
+			}
+
+			template <class U, class T, class ...TS>
+			bool analyze(cursor_cref c, group_cref g, vim_ref vim)
+			{
+				return (analyze<U       >(c, g, vim) ||
+						analyze<T, TS...>(c, g, vim));
+			}
+
+			template <class T, class ...TS>
+			void analyze(cursor_cref c, group_cref g, vim_ref vim, std::tuple<T, TS...>)
+			{
+				if (analyze<T, TS...>(c, g, vim)) return;
+
+				auto it = g.find(c.kind);
+				if (it == end(g)) return;
+
+				auto& kind = it->second;
+				vim.highlight(kind, { c.head.y, c.head.x, c.tail.x-c.head.x });
+			}
+		}
+
+		void analyze(cursor_cref c, group_cref g, vim_ref vim)
+		{
+			analyze_impl::analyze(c, g, vim, all_analyzer_rules{});
+		}
+	}
+
+	void analyzer::parse(source_cref src, group_cref group, vim_ref vim)
+	{
 		tu.parse(src);
 
 		// analyze errors
@@ -55,7 +71,7 @@ namespace vimlight
 				if (!loc.is_from_main()) continue;
 
 				auto pos =  loc.position();
-				list.push_back({ pos.y, pos.x, pos.y, pos.x+1, group.at("error") });
+				vim.highlight(group.at("error"), { pos.y, pos.x, 1 });
 				log << "\t\t" << pos.y << ", " << pos.x << '\n';
 
 				auto ranges = diag.ranges();
@@ -66,8 +82,7 @@ namespace vimlight
 					auto head_pos =       head  .position();
 					auto tail_pos = range.tail().position();
 
-					list.push_back({ head_pos.y, head_pos.x,
-							tail_pos.y, tail_pos.x+1, group.at("error_range") });
+					vim.highlight(group.at("error_range"), { head_pos.y, head_pos.x, 1 });
 					log << "\t\t" << head_pos.y << ", " << head_pos.x
 						<< " -> " << tail_pos.y << ", " << tail_pos.x
 						<< "\n";
@@ -76,30 +91,23 @@ namespace vimlight
 			catch (std::out_of_range) {}
 
 		// semantic highlighting
-		tu.cursor().each_child([&](clang::cursor const& cursor) {
-			auto range = cursor.range();
-			auto head = range.head();
-			if (!head.is_from_main())
-				return false;
+		tu.cursor().each_child([&](cursor_cref c) {
+			if (!c.is_from_main) return false;
 
-			auto head_pos =       head  .position();
-			auto tail_pos = range.tail().position();
-			auto pos = cursor.location().position();
-			auto kind = cursor.kind().name();
-			auto name = cursor.name();
-			log << "\t[" << kind << "]\n"
-				<< "\t\t\"" << name << "\"\n"
-				<< "\t\t" << head_pos.y << ", " << head_pos.x
-				<< " -> " << tail_pos.y << ", " << tail_pos.x
-				<< " @ " << pos.y << ", " << pos.x << '\n';
-			log << "\t\t{" << head.file() << "}\n";
+			log << "\t[" << c.kind << "]\n"
+				<< "\t\t\"" << c.name << "\"\n"
+				<< "\t\t" << c.head.y << ", " << c.head.x
+				<< " -> " << c.tail.y << ", " << c.tail.x
+				<< " @ " << c.pos.y << ", " << c.pos.x << '\n';
+			log << "\t\t{" << c.file() << "}\n";
 
-			auto ref = cursor.reference();
-			auto ref_kind = ref.kind().name();
-			log << "\t\t::[" << ref_kind << "]\n"
-				<< "\t\t\t\"" << ref.name() << "\"\n"
-				<< "\t\t\t{" << ref.range().head().file() << "}\n";
+			auto ref = c.reference();
+			log << "\t\t::[" << ref.kind << "]\n"
+				<< "\t\t\t\"" << ref.name << "\"\n"
+				<< "\t\t\t{" << ref.file() << "}\n";
 
+			analyze(c, group, vim);
+#if 0
 			try {
 				// braces of trivial initializer list
 				if (kind == "InitListExpr") {
@@ -127,7 +135,7 @@ namespace vimlight
 						ref_kind != "CXXConstructor" &&
 						ref_kind != "InvalidFile" &&
 						!is_operator(name)) {
-					auto oc = cursor.first_child();
+					auto oc = c.first_child();
 					if (oc) {
 						auto fc = oc.get();
 						auto fc_kind = fc.kind().name();
@@ -192,11 +200,10 @@ namespace vimlight
 				return true;
 			}
 			catch (std::out_of_range) {}
+#endif
 
 			return true;
 		});
-
-		return list;
 	}
 }
 

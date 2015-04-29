@@ -1,29 +1,26 @@
 #
 # highlight group definition file
 #
-# left hand side CamelCase:
-#		output from clang
+# left hand side:
+#		output from clang or the analyzer
 #
-# left hand side lowercase_underscore:
-#		analyzer's output by analyzing the output from clang
-#
-# right hand side CamelCase:
+# right hand side:
 #		highlight group in vim.
 #		you can see a list of highlight groups by :hi<CR> in vim
 #
 
-TypeRef				Type		# type (class/struct/union), excluding builtin types: int, double, etc.
-NamespaceRef		Special		# namespace
-TemplateRef			Label		# template
-OverloadedDeclRef	SignColumn	# unresolved function ref (because of overloading and templating)
-VariableRef			Underlined	# variable name in lambda's capture list
-error				Error		# error
-error_range			Error		# error range
-init_list_brace		Define		# initializer list's brace
-function_call		Function	# highlight function call
-function_decl		Function	# highlight function declaration
+type-ref				type		# type (class/struct/union), excluding builtin types: int, double, etc.
+namespace-ref			special		# namespace
+template-ref			label		# template
+overloaded-decl-ref		signcolumn	# unresolved function ref (because of overloading and templating)
+variable-ref			underlined	# variable name in lambda's capture list
+error					error		# error
+error-range				error		# error range
+init-list-brace			define		# initializer list's brace
+function-call			function	# highlight function call
+function-decl			function	# highlight function declaration
 
 # FIXME: not everyone like them?
-#member				VisualNOS
-#parameter			TabLine
+#member				visualnos
+#parameter			tabline
 

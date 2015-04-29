@@ -3,7 +3,7 @@
 // the worker thread parses the requested source code and
 // produces vim highlighting commands.
 #include <string>
-#include "analyzer.hh"
+#include "analyzer/analyzer.hh"
 #include "vim.hh"
 #include "highlight/type.hh"
 
@@ -11,8 +11,8 @@ namespace vimlight
 {
 	namespace worker
 	{
-		using   source_type =  analyzer::  source_type;
-		using commands_type =       vim::commands_type;
+		using   source_type =  analyzer::source_type;
+		using      commands =       vim::commands;
 		using filename_type = highlight::filename_type;
 		using   option_type =  analyzer::option_type;
 
@@ -32,7 +32,7 @@ namespace vimlight
 
 		// get the highlight result if done()
 		// returns vim commands
-		commands_type get();
+		commands get();
 
 		// rename the current editing source file, and/or
 		// change the current command line options

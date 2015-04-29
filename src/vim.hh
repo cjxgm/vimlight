@@ -22,7 +22,7 @@ namespace vimlight
 		auto get()
 		{
 			log << "[vimlight-command]\n" << cmds;
-			return std::move(cmds);		// must this be moved? cmds must be cleared after get()
+			return std::move(cmds);
 		}
 
 	private:
