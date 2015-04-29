@@ -5,7 +5,7 @@
 
 namespace clang
 {
-	struct string : public resource::unique<c::string::type>
+	struct string : resource::unique<c::string::type>
 	{
 		using super_type = unique;
 		using cstring_type = char const*;

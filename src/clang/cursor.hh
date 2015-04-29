@@ -12,7 +12,7 @@
 
 namespace clang
 {
-	struct cursor : public resource::bin<c::cursor::type>
+	struct cursor : resource::bin<c::cursor::type>
 	{
 		using self_type = cursor;
 		using super_type = bin;
@@ -23,7 +23,7 @@ namespace clang
 
 
 
-		struct kind : public resource::bin<c::cursor::kind::type>
+		struct kind : resource::bin<c::cursor::kind::type>
 		{
 			using super_type = bin;
 

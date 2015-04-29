@@ -6,7 +6,7 @@
 
 namespace clang
 {
-	struct range : public resource::bin<c::range::type>
+	struct range : resource::bin<c::range::type>
 	{
 		using super_type = bin;
 
