@@ -196,7 +196,7 @@ namespace vimlight
 			return true;
 		});
 
-		return std::move(list);
+		return list;
 	}
 }
 

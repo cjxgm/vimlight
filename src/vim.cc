@@ -21,7 +21,7 @@ namespace vimlight
 			}
 
 			log << "[vimlight commands]\n" << cmds;
-			return std::move(cmds);
+			return cmds;
 		}
 	}
 }
