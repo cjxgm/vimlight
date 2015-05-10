@@ -1,17 +1,32 @@
 #pragma once
 // this module is for generating vim commands for highlighting.
-#include "highlight/list.hh"
+#include "highlight/type.hh"
+#include "highlight/region.hh"
 #include "log.hh"
 #include <string>
+#include <utility>		// for std::move
 
 namespace vimlight
 {
-	namespace vim
+	struct vim
 	{
-		using highlight_list = highlight::list;
-		using commands_type = std::string;
+		using     region = highlight::region;
+		using group_name = highlight::vim_name_type;
+		using     region_cref =     region const&;
+		using group_name_cref = group_name const&;
+		using commands = std::string;
 
-		commands_type highlight(highlight_list const& hls);
-	}
+		void clear();
+		void highlight(group_name_cref g, region_cref r);
+
+		auto get()
+		{
+			log << "[vimlight-command]\n" << cmds;
+			return std::move(cmds);
+		}
+
+	private:
+		commands cmds;
+	};
 }
 

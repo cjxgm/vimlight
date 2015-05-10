@@ -16,46 +16,39 @@ namespace
 			s.replace(pos, from.size(), to);
 	}
 
-	void visualize(std::ofstream & dot, clang::cursor c)
+	void visualize(std::ofstream & dot, clang::cursor const& c)
 	{
-		if (!c.range().head().is_from_main()) return;
+		if (!c.is_from_main) return;
 
 		auto ref = c.reference();
-		auto ref_kind = ref.kind().name();
-		auto ref_name = ref.name();
-
-		auto range = c.range();
-		auto head = range.head().position();
-		auto tail = range.tail().position();
-		auto loc  = c.location().position();
-		auto kind = c.kind().name();
-		auto name = c.name();
 		auto id = c.identifier();
-
 		auto oc = c.first_child();
-		bool highlight = (kind == "CallExpr") &&
-			oc && oc.get().reference().kind().name() != "InvalidFile" &&
-			ref_kind != "InvalidFile" &&
+		auto name = c.name;
+		auto ref_name = ref.name;
+
+		bool highlight = (c.kind == "call-expr") &&
+			oc && oc.get().reference().kind != "invalid-file" &&
+			ref.kind != "invalid-file" &&
 			(name.size() < 8 ? true : name.substr(0, 8) != "operator");
 
 		replace(name, "\\", "\\\\");
 		replace(name, "\"", "\\\"");
 		replace(ref_name, "\"", "\\\"");
 		dot << "\n\t\"" << id << "\" [label=\""
-			<< "[" << kind << "] \\\"" << name << "\\\"\\n"
-			<< head.y << ", " << head.x << " -> "
-			<< tail.y << ", " << tail.x << " @ "
-			<< loc.y << ", " << loc.x << "\\n"
-			<< "[" << ref_kind << "] \\\"" << ref_name << "\\\"" << "\""
+			<< "[" << c.kind << "] \\\"" << name << "\\\"\\n"
+			<< c.head.y << ", " << c.head.x << " -> "
+			<< c.tail.y << ", " << c.tail.x << " @ "
+			<< c.pos.y << ", " << c.pos.x << "\\n"
+			<< "[" << ref.kind << "] \\\"" << ref_name << "\\\"" << "\""
 			<< (highlight ? " color=red fontcolor=red" : "") << "]\n";
 
-		c.each_child([&dot, &id](clang::cursor c) {
-			if (!c.range().head().is_from_main()) return false;
+		c.each_child([&dot, &id](clang::cursor const& c) {
+			if (!c.is_from_main) return false;
 			dot << "\t\"" << id << "\" -> \"" << c.identifier() << "\"\n";
 			return false;
 		});
 
-		c.each_child([&dot](clang::cursor c) {
+		c.each_child([&dot](clang::cursor const& c) {
 			visualize(dot, c);
 			return false;
 		});
@@ -68,7 +61,7 @@ void clang::translation_unit::visualize()
 	std::ofstream dot{"/tmp/vimlight.dot"};
 	if (!dot) return;
 	dot << "digraph {\n"
-		<< "\tnode [fontname=\"Monospace\"]\n"
+		<< "\tnode [fontname=\"monospace\"]\n"
 		<< "\tnode [shape=box]\n"
 		<< "\tnode [width=0]\n";
 	::visualize(dot, cursor());

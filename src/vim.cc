@@ -2,27 +2,22 @@
 
 namespace vimlight
 {
-	namespace vim
+	void vim::clear()
 	{
-		commands_type highlight(highlight_list const& hls)
-		{
-			commands_type cmds{"clear()\n"};
+		cmds += "clear()\n";
+	}
 
-			for (auto& rec: hls) {
-				cmds += "add(\"";
-				cmds += rec.name;
-				cmds += "\",";
-				cmds += std::to_string(rec.y1);
-				cmds += ",";
-				cmds += std::to_string(rec.x1);
-				cmds += ",";
-				cmds += std::to_string(rec.x2 - rec.x1);
-				cmds += ")\n";
-			}
-
-			log << "[vimlight commands]\n" << cmds;
-			return cmds;
-		}
+	void vim::highlight(group_name_cref g, region_cref r)
+	{
+		cmds += "add(\"";
+		cmds += g;
+		cmds += "\",";
+		cmds += std::to_string(r.y);
+		cmds += ",";
+		cmds += std::to_string(r.x);
+		cmds += ",";
+		cmds += std::to_string(r.w);
+		cmds += ")\n";
 	}
 }
 

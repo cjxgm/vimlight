@@ -4,6 +4,15 @@ namespace meta
 {
 	inline namespace constraints
 	{
+		struct only_movable
+		{
+			only_movable() = default;
+			only_movable(only_movable const&) = delete;
+			only_movable(only_movable     &&) = default;
+			only_movable & operator = (only_movable const&) = delete;
+			only_movable & operator = (only_movable     &&) = default;
+		};
+
 		struct non_transferable
 		{
 			non_transferable() = default;
