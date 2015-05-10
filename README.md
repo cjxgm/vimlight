@@ -1,6 +1,8 @@
 # vimlight: clang semantic highlighter for vim
 work in progress...
 
+![showcase](https://raw.githubusercontent.com/cjxgm/vimlight/master/showcase/showcase.gif)
+
 ## license
 <pre style="font-family: monospace;">
                    <b>The MIT License (MIT) Modified</b>
