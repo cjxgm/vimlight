@@ -13,7 +13,7 @@
 
 namespace clang
 {
-	struct translation_unit : public resource::unique<c::translation_unit::type>
+	struct translation_unit : resource::unique<c::translation_unit::type>
 	{
 		using self_type = translation_unit;
 		using super_type = unique;

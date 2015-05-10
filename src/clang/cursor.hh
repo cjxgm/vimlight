@@ -4,7 +4,9 @@
 #include "range.hh"
 #include "location.hh"
 #include "string.hh"
+#include "utils.hh"
 #include "../meta/optional.hh"
+#include "../meta/constraints.hh"
 #include <string>
 #include <functional>
 #include <memory>
@@ -12,38 +14,33 @@
 
 namespace clang
 {
-	struct cursor : public resource::bin<c::cursor::type>
+	struct cursor : resource::bin<c::cursor::type>, meta::only_movable
 	{
 		using self_type = cursor;
 		using super_type = bin;
 		using name_type = std::string;
 		using identifier_type = std::string;
 		using visitor_type = std::function<bool(self_type const&)>;
+		using position_type = struct location::position;
 
 
 
-
-		struct kind : public resource::bin<c::cursor::kind::type>
+		cursor(value_type value)
+			: super_type(value)
+			, _range{c::cursor::get_extent(value)}
+			, _loc{c::cursor::get_location(value)}
+			, kind{uncamel(clang::string{c::cursor::kind::get_spelling(c::cursor::get_kind(value))})}
+			, name{clang::string{c::cursor::get_spelling(value)}}
+			, is_from_main{_range.head().is_from_main()}
+			, pos(_loc.position())
+			, head(_range.head().position())
+			, tail(_range.tail().position())
 		{
-			using super_type = bin;
+		}
 
-			kind(value_type value) : super_type(value) {}
+		auto file() const { return _loc.file(); }
+		auto reference() const { return clang::cursor{c::cursor::get_referenced((get()))}; }
 
-			name_type name() const { return clang::string{c::cursor::kind::get_spelling(get())}; }
-			bool is_decl() const { return c::cursor::kind::is_declaration(get()); }
-			bool is_ref () const { return c::cursor::kind::is_reference  (get()); }
-		};
-
-
-
-
-		cursor(value_type value) : super_type(value) {}
-
-		range range() const { return c::cursor::get_extent(get()); }
-		location location() const { return c::cursor::get_location(get()); }
-		kind kind() const { return c::cursor::get_kind(get()); }
-		name_type name() const { return clang::string{c::cursor::get_spelling(get())}; }
-		cursor reference() const { return clang::cursor{c::cursor::get_referenced((get()))}; }
 		auto first_child() const
 		{
 			using optional_cursor = meta::optional<cursor>;
@@ -91,6 +88,18 @@ namespace clang
 					c::cursor::childs::visit_result::into :
 					c::cursor::childs::visit_result::next);
 		}
+
+
+		const range _range;
+		const location _loc;
+
+	public:
+		const name_type kind;
+		const name_type name;
+		const bool is_from_main;
+		const position_type pos;
+		const position_type head;
+		const position_type tail;
 	};
 }
 

@@ -17,6 +17,8 @@ lua <<END
 	vimlight = require[[vimlight]](root)	-- global variable intentionally
 END
 
+au VimLeave	* call vimlight#leave()
+
 function vimlight#update()
 	if &ft != "cpp" && &ft != "c"
 		return
@@ -41,6 +43,7 @@ function vimlight#enter()
 	syn match cppNamespaceSep "::"
 	hi def link cppNamespaceSep Special
 
+	lua vimlight.identify()
 	lua vimlight.rename()
 	lua vimlight.reoption()
 	lua vimlight.setup()
@@ -73,5 +76,4 @@ function vimlight#default_option()
 	call vimlight#modify()
 endf
 
-au VimLeave	* call vimlight#leave()
 

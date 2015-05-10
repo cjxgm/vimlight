@@ -6,7 +6,7 @@
 
 namespace clang
 {
-	struct location : public resource::bin<c::location::type>
+	struct location : resource::bin<c::location::type>
 	{
 		using self_type = location;
 		using super_type = bin;
@@ -14,7 +14,7 @@ namespace clang
 
 		struct position
 		{
-			using coord_type = unsigned;
+			using coord_type = int;
 			coord_type y;
 			coord_type x;
 		};
@@ -30,7 +30,9 @@ namespace clang
 		{
 			struct position pos;
 			c::location::get_spelling(get(), nullptr,
-					&pos.y, &pos.x, nullptr);
+					reinterpret_cast<unsigned*>(&pos.y),
+					reinterpret_cast<unsigned*>(&pos.x),
+					nullptr);
 			return pos;
 		}
 

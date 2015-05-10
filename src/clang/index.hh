@@ -4,7 +4,7 @@
 
 namespace clang
 {
-	struct index : public resource::unique<c::index::type>
+	struct index : resource::unique<c::index::type>
 	{
 		using super_type = unique;
 

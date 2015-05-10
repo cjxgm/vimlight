@@ -8,7 +8,7 @@ local make_vimlight = function(root)
 	}
 	local env = require[[vimlight_environment]]()
 	local done = true
-	local modified = true
+	local modified = false
 	local vl = {}
 	local file
 	local option
@@ -71,6 +71,10 @@ local make_vimlight = function(root)
 		local y = vim.eval[[getcurpos()]][1]
 		local h = vim.eval[[&lines]]
 		env.view(y, h)
+	end
+
+	vl.identify = function()
+		env.identify()
 	end
 
 	return vl

@@ -24,8 +24,8 @@ namespace vimlight
 
 				struct result : event<1>
 				{
-					commands_type cmds;
-					result(commands_type cmds) : cmds{std::move(cmds)} {}
+					commands cmds;
+					result(commands cmds) : cmds{std::move(cmds)} {}
 				};
 
 				struct setup : event<3>
@@ -57,8 +57,9 @@ namespace vimlight
 			bool operator () (events::request const& ev) const
 			{
 				log << "(worker) parse request\n";
-				auto result = analyzer.parse(ev.src, group);
-				chn_main.post<events::result>({vim::highlight(result)});
+				vim.clear();
+				analyzer.parse(ev.src, group, vim);
+				chn_main.post<events::result>({vim.get()});
 				return true;
 			}
 
@@ -73,13 +74,16 @@ namespace vimlight
 
 			worker_callback(
 					vimlight::analyzer & analyzer,
-					highlight::group & group)
+					highlight::group & group,
+					vimlight::vim & vim)
 				: analyzer{analyzer}
-				, group{group} {}
+				, group{group}
+				, vim{vim} {}
 
 		private:
 			vimlight::analyzer & analyzer;
 			highlight::group & group;
+			vimlight::vim & vim;
 		};
 
 		void start(filename_type const& hlgroup)
@@ -87,9 +91,10 @@ namespace vimlight
 			th = std::thread{[&hlgroup] {
 				vimlight::analyzer analyzer;
 				highlight::group group(hlgroup);
+				vimlight::vim vim;
 				chn_main.post<events::done>();
 
-				while (chn_worker.listen<worker_callback>({analyzer, group})) {}
+				while (chn_worker.listen<worker_callback>({analyzer, group, vim})) {}
 			}};
 
 			chn_main.wait<events::done>();
@@ -105,7 +110,7 @@ namespace vimlight
 			return chn_main.template is<events::result>();
 		}
 
-		commands_type get()
+		commands get()
 		{
 			return chn_main.template get<events::result>().cmds;
 		}

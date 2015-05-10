@@ -14,9 +14,12 @@ namespace vimlight
 			group(filename_type const& fn) { load(fn); }
 			void load(filename_type const& fn);
 			vim_name_type at(clang_name_type const& n) const { return table.at(n); }
+			auto find(clang_name_type const& n) const { return table.find(n); }
 
 		private:
 			table_type table;
+
+			friend auto end(group const& g) { return g.table.end(); }
 		};
 	}
 }
