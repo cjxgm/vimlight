@@ -1,9 +1,14 @@
 local make_vimlight_environment = function()
 	local highlights = {}
 	local env = {}
+	local win_id = 0
+
+	identification = function()
+		return vim.eval[[w:vimlight_id]]
+	end
 
 	local hls = function()
-		local id = vim.eval[[bufnr("")]];
+		local id = identification()
 		if not highlights[id] then highlights[id] = {} end
 		return highlights[id]
 	end
@@ -14,7 +19,7 @@ local make_vimlight_environment = function()
 	end
 
 	local hls_clear = function()
-		local id = vim.eval[[bufnr("")]];
+		local id = identification()
 		highlights[id] = {}
 	end
 
@@ -54,6 +59,14 @@ local make_vimlight_environment = function()
 		for _,hl in ipairs(hls()) do
 			(inside(hl.y) and match_add or match_del)(hl)
 		end
+	end
+
+	env.identify = function()
+		local exists = (vim.eval[[exists("w:vimlight_id")]] ~= 0)
+		if exists then return end
+		win_id = win_id + 1
+		local cmd = [[let w:vimlight_id = %d]]
+		vim.command(cmd:format(win_id))
 	end
 
 	return env
