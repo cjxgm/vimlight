@@ -46,8 +46,8 @@ local make_vimlight = function(root)
 
 	vl.rename = function()
 		file = vim.eval[[expand('%')]]
-		local ft = vim.eval[[&ft]]
-		if file == "" then file = "source." .. ft end
+		if file == "" then file = "source" end
+		file = file .. "." .. vim.eval[[&ft]];
 	end
 
 	vl.reoption = function()
