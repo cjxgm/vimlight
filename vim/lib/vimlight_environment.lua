@@ -69,6 +69,24 @@ local make_vimlight_environment = function()
 		vim.command(cmd:format(win_id))
 	end
 
+	env.insert_line = function(y, n)
+		for _,hl in ipairs(hls()) do
+			if hl.y >= y then
+				hl.y = hl.y + n
+				match_del(hl)
+			end
+		end
+	end
+
+	env.delete_line = function(y, n)
+		for _,hl in ipairs(hls()) do
+			if hl.y >= y+n then
+				hl.y = hl.y - n
+				match_del(hl)
+			end
+		end
+	end
+
 	return env
 end
 

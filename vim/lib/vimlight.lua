@@ -12,6 +12,7 @@ local make_vimlight = function(root)
 	local vl = {}
 	local file
 	local option
+	local nline = 1
 
 	vl.fetch = function()
 		if done then return end
@@ -42,6 +43,15 @@ local make_vimlight = function(root)
 
 	vl.modify = function()
 		modified = true
+
+		-- detect line insertion/deletion, then shift the highlight down/up
+		local n = vim.eval[[line('$')]]
+		if n ~= nline then
+			local y = vim.eval[[line('.')]]
+			local d = math.abs(n - nline) ; -- semicolon required here to avoid parsing ambiguity
+			(n > nline and env.insert_line or env.delete_line)(y, d)
+			nline = n
+		end
 	end
 
 	vl.rename = function()
@@ -68,7 +78,7 @@ local make_vimlight = function(root)
 	end
 
 	vl.view = function()
-		local y = vim.eval[[getcurpos()]][1]
+		local y = vim.eval[[line('.')]]
 		local h = vim.eval[[&lines]]
 		env.view(y, h)
 	end
