@@ -144,7 +144,7 @@ namespace lua
 				error("string expected");
 			size_t len;
 			auto cstr = lua_tolstring(rs, index, &len);
-			str = std::move(string_type(cstr, cstr+len));
+			str = string_type{cstr, cstr+len};
 		}
 
 		void get(cfunc_type& func, int index)
