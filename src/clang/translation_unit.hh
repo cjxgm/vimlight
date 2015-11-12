@@ -1,4 +1,5 @@
 #pragma once
+#include "../dirty-fix.hh"
 #include "../log.hh"
 #include "c.hh"
 #include "resource.hh"
@@ -34,6 +35,7 @@ namespace clang
 			clang::unsaved_file uf(f, "");
 			option_parser op{o};
 
+			dirty_fix::clang_fixer fix;
 			set(c::translation_unit::parse(
 					index, f.c_str(), op.argv(), op.argc(), uf, 1,
 					c::translation_unit::flag::none));
