@@ -1,6 +1,7 @@
 #include "analyzer.hh"
 #include "../log.hh"
 #include "rules.hh"
+#include <algorithm>
 
 namespace vimlight
 {
@@ -50,6 +51,12 @@ namespace vimlight
 		{
 			analyze_impl::analyze(c, g, vim, all_analyzer_rules{});
 		}
+
+		bool ends_with(std::string const& x, std::string const& ending)
+		{
+			if (x.size() < ending.size()) return false;
+			return std::equal(ending.rbegin(), ending.rend(), x.rbegin());
+		}
 	}
 
 	void analyzer::parse(source_cref src, group_cref group, vim_ref vim)
@@ -63,6 +70,11 @@ namespace vimlight
 			try {
 				log << "\t[error]\n"
 					<< "\t\t" << diag.text() << '\n';
+
+				if (ends_with(diag.text(), "warning: #pragma once in main file")) {
+					log << "\t\tSKIPPED\n";
+					continue;
+				}
 
 				auto loc = diag.location();
 				if (!loc.is_from_main()) continue;
