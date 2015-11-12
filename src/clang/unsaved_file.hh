@@ -27,8 +27,8 @@ namespace clang
 		name_type const& name() const { return file; }
 
 	private:
-		name_type const& file;
-		source_type const& src;
+		name_type const file;
+		source_type const src;
 		value_type value;
 
 		void update()
